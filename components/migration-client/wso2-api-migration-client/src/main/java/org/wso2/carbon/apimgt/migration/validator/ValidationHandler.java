@@ -34,8 +34,11 @@ public class ValidationHandler {
     private String tenantArguments = System.getProperty(Constants.ARG_MIGRATE_TENANTS);
     private final String tenantRangeArgs = System.getProperty(Constants.ARG_MIGRATE_TENANTS_RANGE);
     private String blackListTenantArguments = System.getProperty(Constants.ARG_MIGRATE_BLACKLIST_TENANTS);
-    private final String[] validatorList = {Constants.preValidationService.API_AVAILABILITY_VALIDATION,
-            Constants.preValidationService.API_DEFINITION_VALIDATION};
+    private final String[] validatorList = {
+            Constants.preValidationService.API_AVAILABILITY_VALIDATION,
+            Constants.preValidationService.API_DEFINITION_VALIDATION,
+            Constants.preValidationService.API_RESOURCE_LEVEL_AUTH_SCHEME_VALIDATION,
+    };
     private final Validator validator;
 
     public ValidationHandler(String migrateFromVersion, String migratedVersion) {
