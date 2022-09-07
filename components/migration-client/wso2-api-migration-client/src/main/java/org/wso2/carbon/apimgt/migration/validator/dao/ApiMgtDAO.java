@@ -56,7 +56,6 @@ public class ApiMgtDAO {
                 ps.setInt(1, apiId);
                 try (ResultSet resultSet = ps.executeQuery();) {
                     while (resultSet.next()) {
-
                         String script = null;
                         URITemplate uriTemplate = new URITemplate();
                         uriTemplate.setUriTemplate(resultSet.getString("URL_PATTERN"));
@@ -78,7 +77,6 @@ public class ApiMgtDAO {
         } catch (SQLException e) {
             log.error("Error on retrieving URLTemplates for apiResourceLevelAuthSchemeValidation validation", e);
         }
-
         return urlTemplates;
     }
 }
