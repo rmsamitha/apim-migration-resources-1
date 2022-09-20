@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.apimgt.migration.validator.dao;
 
 import org.apache.commons.lang3.StringUtils;
@@ -84,11 +101,9 @@ public class ApiMgtDAO {
         return urlTemplates;
     }
 
-    public Set<ApplicationDTO> getALlApplications() {
+    public Set<ApplicationDTO> getAllApplications() {
         final String query = SQLConstants.GET_ALL_APPLICATIONS;
-
         Set<ApplicationDTO> applications = new HashSet<>();
-
         try (Connection connection = APIMgtDBUtil.getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -107,7 +122,6 @@ public class ApiMgtDAO {
         } catch (SQLException e) {
             log.error("Error on retrieving Applications for appThirdPartyKMValidation", e);
         }
-
         return applications;
     }
 
@@ -140,19 +154,19 @@ public class ApiMgtDAO {
         return applicationKeyMappings;
     }
 
-    public boolean isThirdPartyKeyManagerUsed(String consumerKey) {
-        final String query = SQLConstants.GET_IDN_OAUTH_CONSUMER_APPS_CONSUMER_SECRET_IF_EXIST;
+    public boolean checkIfConsumerAppExists(String consumerKey) {
+        final String query = SQLConstants.GET_IF_IDN_OAUTH_CONSUMER_APP_EXISTS;
 
         try (Connection connection = APIMgtDBUtil.getConnection()) {
             try (PreparedStatement ps = connection.prepareStatement(query)) {
                 ps.setString(1, consumerKey);
                 try (ResultSet rs = ps.executeQuery()) {
-                    return !rs.next();
+                    return rs.next();
                 }
             }
         } catch (SQLException e) {
             log.error("Error on retrieving Consumer Secret for appThirdPartyKMValidation", e);
         }
-        return true;
+        return false;
     }
 }

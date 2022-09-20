@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.apimgt.migration.validator;
 
 import org.apache.commons.logging.Log;
@@ -59,8 +76,10 @@ public class ValidationHandler {
 
     public void doValidation() throws UserStoreException, APIMigrationException {
         if (Arrays.asList(validatorList).contains(preMigrationStep)) {
+            log.info("Running validator step : " + preMigrationStep + " for tenants");
             doTenantValidation(preMigrationStep);
         } else if (Arrays.asList(applicationValidatorList).contains(preMigrationStep)) {
+            log.info("Running validator step : " + preMigrationStep + " for applications");
             doApplicationValidation(preMigrationStep);
         } else {
             log.info("Running all validator steps.........");
@@ -74,6 +93,12 @@ public class ValidationHandler {
         }
     }
 
+    /**
+     * Do tenant wise validations by iterating all tenants
+     * @param preMigrationStep pre-validation step to run
+     * @throws UserStoreException if an error occurs in tenant loading
+     * @throws APIMigrationException if an error occurs while accessing registry
+     */
     private void doTenantValidation(String preMigrationStep) throws UserStoreException, APIMigrationException {
         List<Tenant> tenants = loadTenants();
         for (Tenant tenant : tenants) {
@@ -81,6 +106,10 @@ public class ValidationHandler {
         }
     }
 
+    /**
+     * Do application wise validation by iterating all applications
+     * @param preMigrationStep pre-validation step to run
+     */
     private void doApplicationValidation(String preMigrationStep) {
         List<ApplicationDTO> applications = loadApplications();
         for (ApplicationDTO application : applications) {
@@ -197,7 +226,7 @@ public class ValidationHandler {
     }
 
     private List<ApplicationDTO> loadApplications() {
-        Set<ApplicationDTO> applications = ApiMgtDAO.getInstance().getALlApplications();
+        Set<ApplicationDTO> applications = ApiMgtDAO.getInstance().getAllApplications();
         return new ArrayList<>(applications);
     }
 }

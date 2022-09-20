@@ -62,11 +62,9 @@ public class SQLConstants {
                     "   AM_APPLICATION_KEY_MAPPING APP_KM   " +
                     " WHERE " +
                     "   APP_KM.APPLICATION_ID = ?   ";
-    public static final String GET_IDN_OAUTH_CONSUMER_APPS_CONSUMER_SECRET_IF_EXIST =
+    public static final String GET_IF_IDN_OAUTH_CONSUMER_APP_EXISTS =
             "SELECT" +
-                    "   OC_APP.ID,  " +
-                    "   OC_APP.CONSUMER_KEY,    " +
-                    "   OC_APP.CONSUMER_SECRET  " +
+                    "   1  " +
                     " FROM " +
                     "   IDN_OAUTH_CONSUMER_APPS OC_APP  " +
                     " WHERE " +
