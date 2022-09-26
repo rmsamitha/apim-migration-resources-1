@@ -59,6 +59,7 @@ public class ValidationHandler {
             Constants.preValidationService.API_AVAILABILITY_VALIDATION,
             Constants.preValidationService.API_DEFINITION_VALIDATION,
             Constants.preValidationService.API_RESOURCE_LEVEL_AUTH_SCHEME_VALIDATION,
+            Constants.preValidationService.API_DEPLOYED_GATEWAY_TYPE_VALIDATION,
     };
     private final String[] applicationValidatorList = {
             Constants.preValidationService.APP_THIRD_PARTY_KM_VALIDATION,

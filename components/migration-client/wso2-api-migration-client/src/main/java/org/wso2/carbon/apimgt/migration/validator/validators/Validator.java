@@ -52,6 +52,8 @@ public abstract class Validator {
             validateApiAvailability();
         } else if (Constants.preValidationService.API_RESOURCE_LEVEL_AUTH_SCHEME_VALIDATION.equals(preMigrationStep)) {
             validateApiResourceLevelAuthScheme();
+        } else if (Constants.preValidationService.API_DEPLOYED_GATEWAY_TYPE_VALIDATION.equals(preMigrationStep)) {
+            validateApiDeployedGatewayType(artifact);
         }
     }
 
@@ -63,4 +65,5 @@ public abstract class Validator {
 
     public abstract void validateApiResourceLevelAuthScheme();
 
+    public abstract void validateApiDeployedGatewayType(GenericArtifact apiArtifact);
 }
