@@ -255,10 +255,9 @@ public class V410Validator extends Validator {
             if ("none".equals(environments)) {
                 log.warn("No gateway environments are configured for API {name: " + apiName + ", version: " + apiVersion
                         + ", provider: " + provider + "}. Hence revision deployment will be skipped at migration");
-            } else {
-                log.info("Completed deployed gateway type validation for API {name: " + apiName + ", version: " + apiVersion
-                        + ", provider: " + provider + "}");
             }
+            log.info("Completed deployed gateway type validation for API {name: " + apiName + ", version: " + apiVersion
+                    + ", provider: " + provider + "}");
         } catch (GovernanceException e) {
             log.error("Error on retrieving API Gateway environment from API generic artifact");
         }
