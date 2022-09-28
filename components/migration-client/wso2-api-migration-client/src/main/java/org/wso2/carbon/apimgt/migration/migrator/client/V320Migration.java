@@ -31,7 +31,7 @@ import org.wso2.carbon.apimgt.migration.util.Constants;
 import org.wso2.carbon.user.api.UserStoreException;
 
 public class V320Migration extends VersionMigrator {
-    private static final Log log = LogFactory.getLog(V410Migration.class);
+    private static final Log log = LogFactory.getLog(V320Migration.class);
 
     @Override
     public String getPreviousVersion() {
