@@ -19,6 +19,7 @@ import org.wso2.carbon.apimgt.migration.validator.utils.Utils;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.common.mappings.PublisherCommonUtils;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.GraphQLValidationResponseDTO;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
+import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
@@ -245,4 +246,21 @@ public class V410Validator extends Validator {
 
     }
 
+    @Override
+    public void validateApiDeployedGatewayType(GenericArtifact apiArtifact) {
+        log.info("Validating deployed gateway type for API {name: " + apiName + ", version: " + apiVersion
+                + ", provider: " + provider + "}");
+        try {
+            String environments = apiArtifact.getAttribute(APIConstants.API_OVERVIEW_ENVIRONMENTS);
+            if ("none".equals(environments)) {
+                log.warn("No gateway environments are configured for API {name: " + apiName + ", version: " + apiVersion
+                        + ", provider: " + provider + "}. Hence revision deployment will be skipped at migration");
+            }
+            log.info("Completed deployed gateway type validation for API {name: " + apiName + ", version: " + apiVersion
+                    + ", provider: " + provider + "}");
+        } catch (GovernanceException e) {
+            log.error("Error on retrieving API Gateway environment from API generic artifact", e);
+        }
+
+    }
 }
