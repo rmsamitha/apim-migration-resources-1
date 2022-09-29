@@ -48,55 +48,6 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/target/scripts/migration-4.0.0_to_4.1.0</directory>
-            <outputDirectory>wso2am-migration-${project.version}/migration-4.0.0_to_4.1.0</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/target/scripts/migration-3.2.0_to_4.1.0</directory>
-            <outputDirectory>wso2am-migration-${project.version}/migration-3.2.0_to_4.1.0</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/target/scripts/migration-3.1.0_to_4.1.0</directory>
-            <outputDirectory>wso2am-migration-${project.version}/migration-3.1.0_to_4.1.0</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/target/scripts/migration-3.0.0_to_4.1.0</directory>
-            <outputDirectory>wso2am-migration-${project.version}/migration-3.0.0_to_4.1.0</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/target/scripts/migration-2.6.0_to_4.1.0</directory>
-            <outputDirectory>wso2am-migration-${project.version}/migration-2.6.0_to_4.1.0</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/target/scripts/post-migration-script/am_db</directory>
-            <outputDirectory>wso2am-migration-${project.version}/post-migration-script/am-db</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/target/scripts/post-migration-script/reg_db</directory>
-            <outputDirectory>wso2am-migration-${project.version}/post-migration-script/reg-db</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
             <directory>${project.basedir}/src/main/resources/pre-migration-scripts/migration-2.6.0_to_3.0.0</directory>
             <outputDirectory>wso2am-migration-${project.version}/migration-resources/migration-scripts/pre-migration-scripts/migration-2.6.0_to_3.0.0</outputDirectory>
             <includes>
