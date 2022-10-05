@@ -30,9 +30,8 @@ import org.wso2.carbon.apimgt.migration.validator.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.migration.validator.dto.ApplicationDTO;
 import org.wso2.carbon.apimgt.migration.validator.utils.Utils;
 import org.wso2.carbon.apimgt.migration.validator.utils.UtilsFactory;
+import org.wso2.carbon.apimgt.migration.validator.validators.APIValidator;
 import org.wso2.carbon.apimgt.migration.validator.validators.ApplicationValidator;
-import org.wso2.carbon.apimgt.migration.validator.validators.Validator;
-import org.wso2.carbon.apimgt.migration.validator.validators.ValidatorFactory;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifactImpl;
@@ -64,14 +63,13 @@ public class ValidationHandler {
     private final String[] applicationValidatorList = {
             Constants.preValidationService.APP_THIRD_PARTY_KM_VALIDATION,
     };
-    private final Validator validator;
+    private final APIValidator apiValidator;
     private final ApplicationValidator applicationValidator;
 
-    public ValidationHandler(String migrateFromVersion, String migratedVersion) {
+    public ValidationHandler(String migrateFromVersion) {
         UtilsFactory utilsFactory = new UtilsFactory();
         Utils utils = utilsFactory.getVersionUtils(migrateFromVersion);
-        ValidatorFactory validatorFactory = new ValidatorFactory(utils);
-        this.validator = validatorFactory.getVersionValidator(migratedVersion);
+        this.apiValidator = new APIValidator(utils);
         this.applicationValidator = new ApplicationValidator(utils);
     }
 
@@ -138,7 +136,7 @@ public class ValidationHandler {
                         if (artifactPath.contains("/apimgt/applicationdata/apis/")) {
                             continue;
                         }
-                        validator.validate(registry, artifact, preMigrationStep);
+                        apiValidator.validate(registry, artifact, preMigrationStep);
                     } catch (Exception e) {
                         throw new APIMigrationException("Error occurred while retrieving API from the registry: "
                                 + "artifact path name " + artifactPath, e);

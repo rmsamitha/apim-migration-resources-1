@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.wso2.carbon.apimgt.migration;
 
 import org.apache.commons.logging.Log;
@@ -52,7 +50,7 @@ public class APIMMigrationClient implements ServerStartupObserver {
         String preMigrationStep = System.getProperty(Constants.PRE_MIGRATION_STEP);
 
         if (preMigrationStep != null) {
-            ValidationHandler validationHandler = new ValidationHandler(migrateFromVersion, migratedVersion);
+            ValidationHandler validationHandler = new ValidationHandler(migrateFromVersion);
             try {
                 validationHandler.doValidation();
             } catch (UserStoreException | APIMigrationException e) {
