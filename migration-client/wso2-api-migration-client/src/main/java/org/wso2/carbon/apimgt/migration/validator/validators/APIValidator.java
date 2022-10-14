@@ -7,7 +7,6 @@ import org.wso2.carbon.apimgt.api.APIDefinitionValidationResponse;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.ErrorHandler;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
-import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.ResourceFile;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIConstants.OASResourceAuthTypes;
@@ -18,6 +17,7 @@ import org.wso2.carbon.apimgt.impl.wsdl.model.WSDLValidationResponse;
 import org.wso2.carbon.apimgt.migration.util.Constants;
 import org.wso2.carbon.apimgt.migration.validator.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.migration.validator.utils.Utils;
+import org.wso2.carbon.apimgt.migration.validator.utils.V260Utils;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.common.mappings.PublisherCommonUtils;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.GraphQLValidationResponseDTO;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
@@ -25,6 +25,7 @@ import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.session.UserRegistry;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -33,19 +34,56 @@ import java.sql.SQLException;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public class V400Validator extends Validator {
-    private static final Log log = LogFactory.getLog(V400Validator.class);
+public class APIValidator {
+    protected Utils utils;
+    protected UserRegistry registry;
+    protected String apiName;
+    protected String apiVersion;
+    protected String provider;
+    protected String apiType;
+    protected String apiId;
+    private static final Log log = LogFactory.getLog(APIValidator.class);
     private final String saveSwagger = System.getProperty(Constants.preValidationService.SAVE_INVALID_DEFINITION);
 
-    public V400Validator(Utils utils) {
-        super(utils);
+    public APIValidator(Utils utils) {
+        this.utils = utils;
     }
 
-    @Override
-    public void validateEndpoints() {
+    /**
+     * @param registry         UserRegistry
+     * @param artifact         Artifact corresponding to the API
+     * @param preMigrationStep Pre-validation step to run
+     * @throws GovernanceException if an error occurs while accessing artifact attributes
+     */
+    public void validate(UserRegistry registry, GenericArtifact artifact, String preMigrationStep)
+            throws GovernanceException {
+        this.registry = registry;
+        this.apiName = artifact.getAttribute(APIConstants.API_OVERVIEW_NAME);
+        this.apiVersion = artifact.getAttribute(APIConstants.API_OVERVIEW_VERSION);
+        this.provider = artifact.getAttribute(APIConstants.API_OVERVIEW_PROVIDER);
+
+        // At this point of  pre-validation step, SOAP and SOAPTOREST APIs from 2.6.0 will have their overview_type
+        // set as HTTP, hence we are employing a Util method to fetch correct API Type based on other resources and
+        // artifact fields.
+        if (Constants.VERSION_2_6_0.equals(utils.getMigrateFromVersion())) {
+            this.apiType = V260Utils.getAPIType(artifact);
+        } else {
+            this.apiType = artifact.getAttribute(APIConstants.API_OVERVIEW_TYPE);
+        }
+
+        this.apiId = artifact.getId();
+
+        if (Constants.preValidationService.API_DEFINITION_VALIDATION.equals(preMigrationStep)) {
+            validateAPIDefinition();
+        } else if (Constants.preValidationService.API_AVAILABILITY_VALIDATION.equals(preMigrationStep)) {
+            validateApiAvailability();
+        } else if (Constants.preValidationService.API_RESOURCE_LEVEL_AUTH_SCHEME_VALIDATION.equals(preMigrationStep)) {
+            validateApiResourceLevelAuthScheme();
+        } else if (Constants.preValidationService.API_DEPLOYED_GATEWAY_TYPE_VALIDATION.equals(preMigrationStep)) {
+            validateApiDeployedGatewayType(artifact);
+        }
     }
 
-    @Override
     public void validateAPIDefinition() {
         if (!utils.isStreamingAPI(apiType)) {
             validateOpenAPIDefinition();
@@ -60,7 +98,6 @@ public class V400Validator extends Validator {
         }
     }
 
-    @Override
     public void validateApiAvailability() {
         try {
             log.info("Validating API availability in db for API {name: " + apiName + ", version: " +
@@ -234,7 +271,6 @@ public class V400Validator extends Validator {
         }
     }
 
-    @Override
     public void validateApiResourceLevelAuthScheme() {
 
         Pattern pattern = Pattern.compile("2\\.\\d\\.\\d");
@@ -262,7 +298,6 @@ public class V400Validator extends Validator {
         }
     }
 
-    @Override
     public void validateApiDeployedGatewayType(GenericArtifact apiArtifact) {
         log.info("Validating deployed gateway type for API {name: " + apiName + ", version: " + apiVersion
                 + ", provider: " + provider + "}");
