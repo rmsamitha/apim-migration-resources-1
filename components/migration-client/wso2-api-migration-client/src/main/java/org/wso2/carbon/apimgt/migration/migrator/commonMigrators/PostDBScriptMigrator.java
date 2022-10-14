@@ -30,7 +30,7 @@ public class PostDBScriptMigrator {
     public PostDBScriptMigrator(String scriptPath) {
         this.scriptPath = scriptPath;
     }
-    private static final Log log = LogFactory.getLog(PreDBScriptMigrator.class);
+    private static final Log log = LogFactory.getLog(PostDBScriptMigrator.class);
 
     public void run() {
         try {

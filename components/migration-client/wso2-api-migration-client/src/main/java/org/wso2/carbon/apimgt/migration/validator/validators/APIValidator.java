@@ -93,9 +93,7 @@ public class APIValidator {
         }
 
         this.apiId = artifact.getId();
-        if (Constants.preValidationService.API_ENDPOINT_VALIDATION.equals(preMigrationStep)) {
-            validateEndpoints();
-        } else if (Constants.preValidationService.API_DEFINITION_VALIDATION.equals(preMigrationStep)) {
+        if (Constants.preValidationService.API_DEFINITION_VALIDATION.equals(preMigrationStep)) {
             validateAPIDefinition();
         } else if (Constants.preValidationService.API_AVAILABILITY_VALIDATION.equals(preMigrationStep)) {
             validateApiAvailability();
@@ -104,10 +102,6 @@ public class APIValidator {
         } else if (Constants.preValidationService.API_DEPLOYED_GATEWAY_TYPE_VALIDATION.equals(preMigrationStep)) {
             validateApiDeployedGatewayType(artifact);
         }
-    }
-
-    public void validateEndpoints() {
-
     }
 
     public void validateAPIDefinition() {
