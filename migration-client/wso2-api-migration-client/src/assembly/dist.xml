@@ -4,76 +4,7 @@
         <format>zip</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
-    <files>
-        <file>
-            <source>${project.basedir}/src/main/resources/18to19Migration/sql-scripts/constraint/drop-fk.sql</source>
-            <outputDirectory>migration-scripts/18-19-migration</outputDirectory>
-        </file>
-    </files>
     <fileSets>
-        <fileSet>
-            <directory>${project.basedir}/src/main/resources/18to19Migration/sql-scripts</directory>
-            <outputDirectory>migration-scripts/18-19-migration</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/src/main/resources/19to110Migration/sql-scripts</directory>
-            <outputDirectory>migration-scripts/19-110-migration</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/src/main/resources/19to110Migration/rxts</directory>
-            <outputDirectory>migration-scripts/19-110-migration/rxts</outputDirectory>
-            <includes>
-                <include>*.rxt</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/src/main/resources/110to200Migration/sql-scripts</directory>
-            <outputDirectory>migration-scripts/110-200-migration</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/src/main/resources/110to200Migration/sql-scripts/rxts</directory>
-            <outputDirectory>migration-scripts/110-200-migration/rxts</outputDirectory>
-            <includes>
-                <include>*.rxt</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/src/main/resources/110to200Migration/sql-scripts/stat</directory>
-            <outputDirectory>migration-scripts/110-200-migration/stat</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/src/main/resources/210to220Migration/sql-scripts</directory>
-            <outputDirectory>migration-scripts/210-220-migration</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/src/main/resources/220to250Migration/sql-scripts</directory>
-            <outputDirectory>migration-scripts/220-250-migration</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/src/main/resources/250to260Migration/sql-scripts</directory>
-            <outputDirectory>migration-scripts/250-260-migration</outputDirectory>
-            <includes>
-                <include>*.sql</include>
-            </includes>
-        </fileSet>
         <fileSet>
             <directory>${project.basedir}/src/main/resources/310to320Migration/rxts</directory>
             <outputDirectory>migration-resources/rxts</outputDirectory>
@@ -83,7 +14,7 @@
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}</directory>
-            <outputDirectory></outputDirectory>
+            <outputDirectory>dropins</outputDirectory>
             <includes>
                 <include>*.jar</include>
             </includes>
