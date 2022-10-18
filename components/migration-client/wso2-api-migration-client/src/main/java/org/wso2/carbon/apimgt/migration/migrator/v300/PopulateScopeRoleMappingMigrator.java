@@ -23,20 +23,21 @@ import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.migration.APIMigrationException;
+import org.wso2.carbon.apimgt.migration.client.internal.ServiceHolder;
 import org.wso2.carbon.apimgt.migration.migrator.Migrator;
 import org.wso2.carbon.apimgt.migration.migrator.Utility;
 import org.wso2.carbon.apimgt.migration.dao.SharedDAO;
 import org.wso2.carbon.apimgt.migration.dto.UserRoleFromPermissionDTO;
 import org.wso2.carbon.apimgt.migration.util.Constants;
 import org.wso2.carbon.apimgt.migration.util.RegistryServiceImpl;
+import org.wso2.carbon.registry.core.Resource;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.user.api.Tenant;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.IOException;
 import java.util.List;
-
-import static org.wso2.carbon.apimgt.migration.client.MigrationClientBase.updateTenantConf;
 
 public class PopulateScopeRoleMappingMigrator extends Migrator {
     private static final Log log = LogFactory.getLog(PopulateScopeRoleMappingMigrator.class);
@@ -129,5 +130,25 @@ public class PopulateScopeRoleMappingMigrator extends Migrator {
             }
         }
         log.info("WSO2 API-M Migration Task : Updating User Roles done for all the tenants.");
+    }
+
+    public static void updateTenantConf(String tenantConfString, int tenantId) throws APIMigrationException {
+
+        org.wso2.carbon.registry.core.service.RegistryService registryService = ServiceHolder.getRegistryService();
+        try {
+            UserRegistry registry = registryService.getConfigSystemRegistry(tenantId);
+            updateTenantConf(registry, tenantConfString.getBytes());
+        } catch (RegistryException e) {
+            throw new APIMigrationException("Error while saving tenant conf to the registry of tenant "
+                    + tenantId, e);
+        }
+    }
+
+    private static void updateTenantConf(UserRegistry registry, byte[] data) throws RegistryException {
+
+        Resource resource = registry.newResource();
+        resource.setMediaType(APIConstants.API_TENANT_CONF_MEDIA_TYPE);
+        resource.setContent(data);
+        registry.put(APIConstants.API_TENANT_CONF_LOCATION, resource);
     }
 }
