@@ -28,6 +28,7 @@ import org.wso2.carbon.apimgt.migration.migrator.v320.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.migration.migrator.Migrator;
 import org.wso2.carbon.apimgt.migration.migrator.Utility;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifactImpl;
@@ -66,11 +67,14 @@ public class V320DBDataMigrator extends Migrator {
      * @throws APIMigrationException APIMigrationException
      */
     private void updateAPITypeInDb() throws APIMigrationException {
+        boolean isError = false;
+        log.info("WSO2 API-M Migration Task : Started updating API Type in DB for all tenants");
         tenantManager = ServiceHolder.getRealmService().getTenantManager();
-
         try {
             List<Tenant> tenants = APIUtil.getAllTenantsWithSuperTenant();
             for (Tenant tenant : tenants) {
+                log.info("WSO2 API-M Migration Task : Started updating API Type in DB " +
+                        "for tenant: " + tenant.getDomain());
                 List<APIInfoDTO> apiInfoDTOList = new ArrayList<>();
                 try {
                     int apiTenantId = tenantManager.getTenantId(tenant.getDomain());
@@ -83,31 +87,56 @@ public class V320DBDataMigrator extends Migrator {
                     if (tenantArtifactManager != null) {
                         GenericArtifact[] tenantArtifacts = tenantArtifactManager.getAllGenericArtifacts();
                         for (GenericArtifact artifact : tenantArtifacts) {
-                            String artifactPath = ((GenericArtifactImpl) artifact).getArtifactPath();
-                            if (artifactPath.contains("/apimgt/applicationdata/apis/")) {
-                                continue;
+                            try {
+                                String artifactPath = ((GenericArtifactImpl) artifact).getArtifactPath();
+                                if (artifactPath.contains("/apimgt/applicationdata/apis/")) {
+                                    continue;
+                                }
+                                APIInfoDTO apiInfoDTO = new APIInfoDTO();
+                                apiInfoDTO.setApiProvider(
+                                        APIUtil.replaceEmailDomainBack(artifact.getAttribute("overview_provider")));
+                                apiInfoDTO.setApiName(artifact.getAttribute("overview_name"));
+                                apiInfoDTO.setApiVersion(artifact.getAttribute("overview_version"));
+                                apiInfoDTO.setType(artifact.getAttribute("overview_type"));
+                                apiInfoDTOList.add(apiInfoDTO);
+                            } catch (GovernanceException e) {
+                                log.error("WSO2 API-M Migration Task : Error while " +
+                                        "fetching attributes from artifact, artifact path: " +
+                                        ((GenericArtifactImpl) artifact).getArtifactPath(), e);
+                                isError = true;
                             }
-                            APIInfoDTO apiInfoDTO = new APIInfoDTO();
-                            apiInfoDTO.setApiProvider(
-                                    APIUtil.replaceEmailDomainBack(artifact.getAttribute("overview_provider")));
-                            apiInfoDTO.setApiName(artifact.getAttribute("overview_name"));
-                            apiInfoDTO.setApiVersion(artifact.getAttribute("overview_version"));
-                            apiInfoDTO.setType(artifact.getAttribute("overview_type"));
-                            apiInfoDTOList.add(apiInfoDTO);
                         }
                         apiMgtDAO.updateApiType(apiInfoDTOList, tenant.getId(), tenant.getDomain());
                     }
+                } catch (RegistryException e) {
+                    log.error("WSO2 API-M Migration Task : Error while initiation the registry, tenant domain: " +
+                            tenant.getDomain(), e);
+                    isError = true;
+                } catch (UserStoreException e) {
+                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: " +
+                            tenant.getDomain(), e);
+                    isError = true;
+                } catch (APIManagementException e) {
+                    log.error("WSO2 API-M Migration Task : Error while retrieving API artifact, tenant domain: " +
+                            tenant.getDomain(), e);
+                    isError = true;
+                } catch (APIMigrationException e) {
+                    log.error("WSO2 API-M Migration Task : Error while updating API type, tenant domain: " +
+                            tenant.getDomain(), e);
+                    isError = true;
                 } finally {
                     PrivilegedCarbonContext.endTenantFlow();
                 }
             }
-        } catch (RegistryException e) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error while initiation the registry", e);
         } catch (UserStoreException e) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error while retrieving the tenants", e);
-        } catch (APIManagementException e) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error while Retrieving API artifact from the "
-                    + "registry", e);
+            log.error("WSO2 API-M Migration Task : Error while retrieving the tenants", e);
+            isError = true;
+        }
+        if (isError) {
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred during " +
+                    "updating API Type in DB for all tenants");
+        } else {
+            log.info("WSO2 API-M Migration Task : Completed updating API Type in DB for all tenants");
         }
     }
 }
