@@ -47,7 +47,7 @@ public class MigrateUUIDToDB extends MigrationClientBase{
 
     protected Registry registry;
     protected TenantManager tenantManager;
-    private static final Log log = LogFactory.getLog(ScopeRoleMappingPopulationClient.class);
+    private static final Log log = LogFactory.getLog(MigrateUUIDToDB.class);
     APIMgtDAO apiMgtDAO = APIMgtDAO.getInstance();
     public MigrateUUIDToDB(String tenantArguments, String blackListTenantArguments, String tenantRange,
                            TenantManager tenantManager) throws UserStoreException, APIManagementException {
@@ -60,11 +60,14 @@ public class MigrateUUIDToDB extends MigrationClientBase{
      * @throws APIMigrationException
      */
     public void moveUUIDToDBFromRegistry() throws APIMigrationException {
+        boolean isError = false;
         log.info("WSO2 API-M Migration Task : Adding API UUID and STATUS to AM_API table for all tenants");
         List<APIInfoDTO> apiInfoDTOList = new ArrayList<>();
         try {
             List<Tenant> tenants = APIUtil.getAllTenantsWithSuperTenant();
             for (Tenant tenant : tenants) {
+                log.info("WSO2 API-M Migration Task : Adding API UUID and STATUS to AM_API table for tenant: "
+                        + tenant.getId() + '(' + tenant.getDomain() + ')');
                 try {
                     int apiTenantId = tenantManager.getTenantId(tenant.getDomain());
                     APIUtil.loadTenantRegistry(apiTenantId);
@@ -76,32 +79,51 @@ public class MigrateUUIDToDB extends MigrationClientBase{
                     if (tenantArtifactManager != null) {
                         GenericArtifact[] tenantArtifacts = tenantArtifactManager.getAllGenericArtifacts();
                         for (GenericArtifact artifact : tenantArtifacts) {
-                            API api = APIUtil.getAPI(artifact);
-                            if (api != null) {
-                                APIInfoDTO apiInfoDTO = new APIInfoDTO();
-                                apiInfoDTO.setUuid(api.getUUID());
-                                apiInfoDTO.setApiProvider(APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
-                                apiInfoDTO.setApiName(api.getId().getApiName());
-                                apiInfoDTO.setApiVersion(api.getId().getVersion());
-                                apiInfoDTO.setStatus(api.getStatus());
-                                apiInfoDTOList.add(apiInfoDTO);
+                            try {
+                                API api = APIUtil.getAPI(artifact);
+                                if (api != null) {
+                                    APIInfoDTO apiInfoDTO = new APIInfoDTO();
+                                    apiInfoDTO.setUuid(api.getUUID());
+                                    apiInfoDTO.setApiProvider(APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+                                    apiInfoDTO.setApiName(api.getId().getApiName());
+                                    apiInfoDTO.setApiVersion(api.getId().getVersion());
+                                    apiInfoDTO.setStatus(api.getStatus());
+                                    apiInfoDTOList.add(apiInfoDTO);
+                                }
+                            } catch (APIManagementException e) {
+                                log.error("WSO2 API-M Migration Task : Error while getting API from API Util: ", e);
+                                isError = true;
                             }
                         }
                     }
+                } catch (RegistryException e) {
+                    log.error("WSO2 API-M Migration Task : Error while initiation the registry, tenant domain: " +
+                            tenant.getDomain(), e);
+                    isError = true;
+                } catch (UserStoreException e) {
+                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: " +
+                            tenant.getDomain(), e);
+                    isError = true;
+                } catch (APIManagementException e) {
+                    log.error("WSO2 API-M Migration Task : Error while retrieving API artifact from the registry, " +
+                            "tenant domain: " + tenant.getDomain(), e);
+                    isError = true;
                 } finally {
                     PrivilegedCarbonContext.endTenantFlow();
                 }
             }
             apiMgtDAO.updateUUIDAndStatus(apiInfoDTOList);
             log.info("WSO2 API-M Migration Task : Added API UUID and STATUS to AM_API table for all tenants");
-        } catch (RegistryException e) {
-            log.error("WSO2 API-M Migration Task : Error while initializing the registry", e);
         } catch (UserStoreException e) {
             log.error("WSO2 API-M Migration Task : Error while retrieving the tenants", e);
-        } catch (APIManagementException e) {
-            log.error("WSO2 API-M Migration Task : Error while Retrieving API artifact from the registry", e);
+            isError = true;
         }
-
+        if (isError) {
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while " +
+                    "adding API UUID and STATUS to AM_API table for all tenants");
+        } else {
+            log.info("WSO2 API-M Migration Task : Added API UUID and STATUS to AM_API table for all tenants");
+        }
     }
     protected void startTenantFlow(String tenantDomain) {
         PrivilegedCarbonContext.startTenantFlow();
