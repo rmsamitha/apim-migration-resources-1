@@ -169,6 +169,10 @@ public class V400DBDataMigrator extends Migrator {
                                     .concat(END_CERTIFICATE_STRING);
                             base64EncodedString = Base64.encodeBase64URLSafeString(base64EncodedString.getBytes());
                             certificateMap.put(alias, base64EncodedString);
+                        } else {
+                            log.error("WSO2 API-M Migration Task : Error while retrieving endpoint certificate for" +
+                                    " alias: " + alias + ". The certificate does not exist in the trust store.");
+                            isError = true;
                         }
                         log.info("WSO2 API-M Migration Task : Adding encoded certificate content of alias: " + alias
                                 + " to DB");
