@@ -145,10 +145,13 @@ public class APIValidator {
         } catch (APIManagementException e) {
             log.error("Error while validating open API definition for " + apiName + " version: " + apiVersion
                     + " type: " + apiType, e);
+        } catch (Exception e) {
+            log.error("An unhandled exception has occurred while validating open API definition for " + apiName
+                    + " version: " + apiVersion + " type: " + apiType, e);
         }
         if (validationResponse != null && !validationResponse.isValid()) {
             if (saveSwagger != null) {
-                utils.saveInvalidDefinition(apiId, apiDefinition);
+                utils.saveInvalidDefinition(apiName, apiVersion, provider, apiId, apiDefinition);
             }
             for (ErrorHandler error : validationResponse.getErrorItems()) {
                 log.error("OpenAPI Definition for API {name: " + apiName + ", version: " +
@@ -159,19 +162,33 @@ public class APIValidator {
             log.error("Error while validating open API definition for " + apiName + " version: " + apiVersion
                     + " type: " + apiType + ". Swagger definition of the API is missing...");
         } else {
-            APIDefinition parser = validationResponse.getParser();
-            try {
-                if (parser != null) {
-                    parser.getURITemplates(apiDefinition);
+            if (validationResponse != null) {
+                APIDefinition parser = validationResponse.getParser();
+                try {
+                    if (parser != null) {
+                        parser.getURITemplates(apiDefinition);
+                    }
+                    log.info("Successfully validated open API definition of " + apiName + " version: " + apiVersion
+                            + " type: " + apiType);
+                } catch (APIManagementException e) {
+                    log.error("Error while retrieving URI Templates for " + apiName + " version: " + apiVersion
+                            + " type: " + apiType, e);
+                    if (saveSwagger != null) {
+                        utils.saveInvalidDefinition(apiName, apiVersion, provider, apiId, apiDefinition);
+                    }
+                } catch (Exception e) {
+                    log.error("Error while retrieving URI Templates for un handled exception " + apiName
+                            + " version: " + apiVersion + " type: " + apiType, e);
+                    if (saveSwagger != null) {
+                        utils.saveInvalidDefinition(apiName, apiVersion, provider, apiId, apiDefinition);
+                    }
                 }
-                log.info("Successfully validated open API definition of " + apiName + " version: " + apiVersion
-                        + " type: " + apiType);
-            } catch (APIManagementException e) {
+            } else {
+                log.error("Error while validating open API definition for " + apiName + " version: " + apiVersion
+                        + " type: " + apiType + " Validation response is null.");
                 if (saveSwagger != null) {
-                    utils.saveInvalidDefinition(apiId, apiDefinition);
+                    utils.saveInvalidDefinition(apiName, apiVersion, provider, apiId, apiDefinition);
                 }
-                log.error("Error while retrieving URI Templates for " + apiName + " version: " + apiVersion
-                        + " type: " + apiType, e);
             }
         }
     }

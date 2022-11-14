@@ -54,14 +54,16 @@ public class V300RegistryResourceMigrator extends RegistryResourceMigrator {
      *
      * @throws APIMigrationException
      */
-    private void updateGenericAPIArtifacts(RegistryService registryService) {
+    private void updateGenericAPIArtifacts(RegistryService registryService) throws APIMigrationException {
+        boolean isError = false;
+        log.info("WSO2 API-M Migration Task : Started Updating API artifacts for all tenants");
         for (Tenant tenant : tenants) {
-            try {
-                registryService.startTenantFlow(tenant);
-                log.info("WSO2 API-M Migration Task : Updating APIs of tenant " + tenant.getId() +
-                        '(' + tenant.getDomain() + ')');
-                GenericArtifact[] artifacts = registryService.getGenericAPIArtifacts();
-                for (GenericArtifact artifact : artifacts) {
+            registryService.startTenantFlow(tenant);
+            log.info("WSO2 API-M Migration Task : Updating APIs of tenant " + tenant.getId()
+                    + '(' + tenant.getDomain() + ')');
+            GenericArtifact[] artifacts = registryService.getGenericAPIArtifacts();
+            for (GenericArtifact artifact : artifacts) {
+                try {
                     String path = artifact.getPath();
                     if (registryService.isGovernanceRegistryResourceExists(path)) {
                         Object apiResource = registryService.getGovernanceRegistryResource(path);
@@ -71,18 +73,25 @@ public class V300RegistryResourceMigrator extends RegistryResourceMigrator {
                         registryService.updateGenericAPIArtifactsForAccessControl(path, artifact);
                         registryService.updateGenericAPIArtifact(path, artifact);
                     }
+                } catch (GovernanceException e) {
+                    log.error("WSO2 API-M Migration Task : Error while accessing API artifact "
+                            + "in registry for tenant " + tenant.getId() + '(' + tenant.getDomain() + ')', e);
+                    isError = true;
+                } catch (RegistryException | UserStoreException e) {
+                    log.error("WSO2 API-M Migration Task : Error while updating API artifact "
+                            + "in the registry for tenant " + tenant.getId() + '(' + tenant.getDomain() + ')', e);
+                    isError = true;
                 }
-                log.info("WSO2 API-M Migration Task : Completed Updating API artifacts of tenant " + tenant.getId() +
-                        '(' + tenant.getDomain() + ')');
-            } catch (GovernanceException e) {
-                log.error("WSO2 API-M Migration Task : Error while accessing API artifact in registry for tenant "
-                        + tenant.getId() + '(' + tenant.getDomain() + ')', e);
-            } catch (RegistryException | UserStoreException e) {
-                log.error("WSO2 API-M Migration Task : Error while updating API artifact in the registry for tenant "
-                        + tenant.getId() + '(' + tenant.getDomain() + ')', e);
-            } finally {
-                registryService.endTenantFlow();
             }
+            log.info("WSO2 API-M Migration Task : Completed Updating API artifacts of tenant "
+                    + tenant.getId() + '(' + tenant.getDomain() + ')');
+            registryService.endTenantFlow();
+        }
+        if (isError) {
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred during "
+                    + "Updating API artifacts of tenants");
+        } else {
+            log.info("WSO2 API-M Migration Task : Completed Updating API artifacts for all tenants");
         }
     }
 }

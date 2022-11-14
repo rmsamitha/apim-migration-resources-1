@@ -34,6 +34,7 @@ import org.wso2.carbon.apimgt.migration.dto.*;
 import org.wso2.carbon.apimgt.migration.util.RegistryService;
 import org.wso2.carbon.apimgt.migration.util.RegistryServiceImpl;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifactImpl;
@@ -147,7 +148,8 @@ public class V400DBDataMigrator extends Migrator {
     }
 
     public void migrateEndpointCertificates() throws APIMigrationException {
-
+        boolean isError = false;
+        log.info("WSO2 API-M Migration Task : Started Migrating Endpoint Certificates");
         File trustStoreFile = new File(TRUST_STORE);
 
         try {
@@ -159,24 +161,45 @@ public class V400DBDataMigrator extends Migrator {
             Map<String, String> certificateMap = new HashMap<>();
             if (!aliases.isEmpty()) {
                 for (String alias : aliases) {
-                    Certificate certificate = trustStore.getCertificate(alias);
-                    if (certificate != null) {
-                        byte[] encoded = Base64.encodeBase64(certificate.getEncoded());
-                        String base64EncodedString = BEGIN_CERTIFICATE_STRING.concat(new String(encoded)).concat("\n")
-                                .concat(END_CERTIFICATE_STRING);
-                        base64EncodedString = Base64.encodeBase64URLSafeString(base64EncodedString.getBytes());
-                        certificateMap.put(alias, base64EncodedString);
+                    try {
+                        Certificate certificate = trustStore.getCertificate(alias);
+                        if (certificate != null) {
+                            log.info("WSO2 API-M Migration Task : Adding encoded certificate content of alias: "
+                                    + alias + " to DB");
+                            byte[] encoded = Base64.encodeBase64(certificate.getEncoded());
+                            String base64EncodedString = BEGIN_CERTIFICATE_STRING.concat(new String(encoded)).concat("\n")
+                                    .concat(END_CERTIFICATE_STRING);
+                            base64EncodedString = Base64.encodeBase64URLSafeString(base64EncodedString.getBytes());
+                            certificateMap.put(alias, base64EncodedString);
+                        } else {
+                            log.error("WSO2 API-M Migration Task : Error while retrieving endpoint certificate for"
+                                    + " alias: " + alias + ". The certificate does not exist in the trust store.");
+                            isError = true;
+                        }
+                    } catch (KeyStoreException e) {
+                        log.error("WSO2 API-M Migration Task : Error while "
+                                + "getting certificate from trust store for alias: " + alias, e);
+                        isError = true;
+                    } catch (CertificateException e) {
+                        log.error("WSO2 API-M Migration Task : Error while "
+                                + "encoding certificate for alias: " + alias, e);
+                        isError = true;
                     }
-                    log.info("WSO2 API-M Migration Task : Adding encoded certificate content of alias: " + alias
-                            + " to DB");
                 }
             } else {
                 log.info("WSO2 API-M Migration Task : No endpoint certificates defined");
             }
             APIMgtDAO.getInstance().updateEndpointCertificates(certificateMap);
         } catch (NoSuchAlgorithmException | IOException | CertificateException
-                | KeyStoreException | APIMigrationException e) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error while Migrating Endpoint Certificates", e);
+                 | KeyStoreException | APIMigrationException e) {
+            log.error("WSO2 API-M Migration Task : Error while Migrating Endpoint Certificates", e);
+            isError = true;
+        }
+        if (isError) {
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while "
+                    + "Migrating Endpoint Certificates");
+        } else {
+            log.info("WSO2 API-M Migration Task : Completed Migrating Endpoint Certificates");
         }
     }
 
@@ -219,9 +242,11 @@ public class V400DBDataMigrator extends Migrator {
 
     /**
      * Get the List of APIs and pass it to DAO method to update the uuid
+     *
      * @throws APIMigrationException APIMigrationException
      */
     protected void moveUUIDToDBFromRegistry() throws APIMigrationException {
+        boolean isError = false;
         log.info("WSO2 API-M Migration Task : Adding API UUID and STATUS to AM_API table for all tenants");
         List<APIInfoDTO> apiInfoDTOList = new ArrayList<>();
         tenantManager = ServiceHolder.getRealmService().getTenantManager();
@@ -239,33 +264,53 @@ public class V400DBDataMigrator extends Migrator {
                     if (tenantArtifactManager != null) {
                         GenericArtifact[] tenantArtifacts = tenantArtifactManager.getAllGenericArtifacts();
                         for (GenericArtifact artifact : tenantArtifacts) {
-                            String artifactPath = ((GenericArtifactImpl) artifact).getArtifactPath();
-                            if (artifactPath.contains("/apimgt/applicationdata/apis/")) {
-                                continue;
+                            try {
+                                String artifactPath = ((GenericArtifactImpl) artifact).getArtifactPath();
+                                if (artifactPath.contains("/apimgt/applicationdata/apis/")) {
+                                    continue;
+                                }
+                                APIInfoDTO apiInfoDTO = new APIInfoDTO();
+                                apiInfoDTO.setUuid(artifact.getId());
+                                apiInfoDTO.setApiProvider(
+                                        APIUtil.replaceEmailDomainBack(artifact.getAttribute("overview_provider")));
+                                apiInfoDTO.setApiName(artifact.getAttribute("overview_name"));
+                                apiInfoDTO.setApiVersion(artifact.getAttribute("overview_version"));
+                                apiInfoDTO.setStatus(((GenericArtifactImpl) artifact).getLcState());
+                                apiInfoDTOList.add(apiInfoDTO);
+                            } catch (GovernanceException e) {
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "fetching attributes from artifact, artifact path: "
+                                        + ((GenericArtifactImpl) artifact).getArtifactPath(), e);
+                                isError = true;
                             }
-                            APIInfoDTO apiInfoDTO = new APIInfoDTO();
-                            apiInfoDTO.setUuid(artifact.getId());
-                            apiInfoDTO.setApiProvider(
-                                    APIUtil.replaceEmailDomainBack(artifact.getAttribute("overview_provider")));
-                            apiInfoDTO.setApiName(artifact.getAttribute("overview_name"));
-                            apiInfoDTO.setApiVersion(artifact.getAttribute("overview_version"));
-                            apiInfoDTO.setStatus(((GenericArtifactImpl) artifact).getLcState());
-                            apiInfoDTOList.add(apiInfoDTO);
                         }
                     }
+                } catch (RegistryException e) {
+                    log.error("WSO2 API-M Migration Task : Error while initiation the registry, tenant domain: "
+                            + tenant.getDomain(), e);
+                    isError = true;
+                } catch (UserStoreException e) {
+                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: "
+                            + tenant.getDomain(), e);
+                    isError = true;
+                } catch (APIManagementException e) {
+                    log.error("WSO2 API-M Migration Task : Error while retrieving API artifact from the registry, "
+                            + "tenant domain: " + tenant.getDomain(), e);
+                    isError = true;
                 } finally {
                     PrivilegedCarbonContext.endTenantFlow();
                 }
             }
             apiMgtDAO.updateUUIDAndStatus(apiInfoDTOList);
-            log.info("WSO2 API-M Migration Task : Added API UUID and STATUS to AM_API table for all tenants");
-
-        } catch (RegistryException e) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error while initiation the registry", e);
         } catch (UserStoreException e) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error while retrieving the tenants", e);
-        } catch (APIManagementException e) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error while Retrieving API artifact from the registry", e);
+            log.error("WSO2 API-M Migration Task : Error while retrieving the tenants", e);
+            isError = true;
+        }
+        if (isError) {
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while "
+                    + "adding API UUID and STATUS to AM_API table for all tenants");
+        } else {
+            log.info("WSO2 API-M Migration Task : Added API UUID and STATUS to AM_API table for all tenants");
         }
     }
 }
