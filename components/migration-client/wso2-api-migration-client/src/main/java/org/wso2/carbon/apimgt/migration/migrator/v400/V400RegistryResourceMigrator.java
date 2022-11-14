@@ -161,8 +161,8 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
                     if (tenantArtifactManager != null) {
                         GenericArtifact[] tenantArtifacts = tenantArtifactManager.getAllGenericArtifacts();
                         if (tenantArtifacts.length > 0) {
-                            log.info("WSO2 API-M Migration Task : Migrating WebSocket APIs of tenant " +
-                                    tenant.getId() + '(' + tenant.getDomain() + ')');
+                            log.info("WSO2 API-M Migration Task : Migrating WebSocket APIs of tenant "
+                                    + tenant.getId() + '(' + tenant.getDomain() + ')');
                         }
                         for (GenericArtifact artifact : tenantArtifacts) {
                             try {
@@ -194,45 +194,45 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
                                         APIProvider apiProviderTenant = APIManagerFactory.getInstance()
                                                 .getAPIProvider(APIUtil.getTenantAdminUserName(tenant.getDomain()));
                                         apiProviderTenant.saveAsyncApiDefinition(api, apiDefinition);
-                                        log.info("WSO2 API-M Migration Task : Generated and added " +
-                                                "Async API definition for WS API: " + apiIdentifier);
+                                        log.info("WSO2 API-M Migration Task : Generated and added "
+                                                + "Async API definition for WS API: " + apiIdentifier);
                                     } else {
-                                        log.error("WSO2 API-M Migration Task :  Async Api definition " +
-                                                "is not added for the API " + artifact.getAttribute(
+                                        log.error("WSO2 API-M Migration Task :  Async Api definition "
+                                                + "is not added for the API " + artifact.getAttribute(
                                                 org.wso2.carbon.apimgt.impl.APIConstants.API_OVERVIEW_NAME)
                                                 + " due to returned API is null");
                                         isError = true;
                                     }
                                 }
                             } catch (GovernanceException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "fetching attributes from artifact, artifact path: " +
-                                        ((GenericArtifactImpl) artifact).getArtifactPath(), e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "fetching attributes from artifact, artifact path: "
+                                        + ((GenericArtifactImpl) artifact).getArtifactPath(), e);
                                 isError = true;
                             } catch (APIManagementException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "generating/saving Async API Definition, artifact path: " +
-                                        ((GenericArtifactImpl) artifact).getArtifactPath(), e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "generating/saving Async API Definition, artifact path: "
+                                        + ((GenericArtifactImpl) artifact).getArtifactPath(), e);
                                 isError = true;
                             } catch (APIMigrationException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "apiMgtDao access for migrating WebSocket APIs, artifact path: " +
-                                        ((GenericArtifactImpl) artifact).getArtifactPath(), e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "apiMgtDao access for migrating WebSocket APIs, artifact path: "
+                                        + ((GenericArtifactImpl) artifact).getArtifactPath(), e);
                                 isError = true;
                             }
                         }
                     }
                 } catch (RegistryException e) {
-                    log.error("WSO2 API-M Migration Task : Error while initializing the registry, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while initializing the registry, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (UserStoreException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (APIManagementException e) {
-                    log.error("WSO2 API-M Migration Task : Error while accessing APIUtil " +
-                            "for migrating WebSocket APIs, tenant domain: " + tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while accessing APIUtil "
+                            + "for migrating WebSocket APIs, tenant domain: " + tenant.getDomain(), e);
                     isError = true;
                 } finally {
                     PrivilegedCarbonContext.endTenantFlow();
@@ -243,8 +243,8 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
             isError = true;
         }
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred " +
-                    "while migrating WebSocket APIs for all tenants");
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred "
+                    + "while migrating WebSocket APIs for all tenants");
         } else {
             log.info("WSO2 API-M Migration Task : Completed migrating WebSocket APIs for all tenants");
         }
@@ -511,8 +511,8 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
                                         if (optionalEnv.isPresent()) {
                                             dynamicEnv = optionalEnv.get();
                                         } else {
-                                            log.error("WSO2 API-M Migration Task : Error while retrieving dynamic " +
-                                                    "environment of the label: " + label);
+                                            log.error("WSO2 API-M Migration Task : Error while retrieving dynamic "
+                                                    + "environment of the label: " + label);
                                             isError = true;
                                             continue;
                                         }
@@ -543,31 +543,31 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
                                     }
                                 }
                             } catch (RegistryException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "initiation the registry, API uuid: " + apiInfoDTO.getUuid(), e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "initiation the registry, API uuid: " + apiInfoDTO.getUuid(), e);
                                 isError = true;
                             } catch (APIManagementException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "deploying API revisions, API uuid: " + apiInfoDTO.getUuid(), e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "deploying API revisions, API uuid: " + apiInfoDTO.getUuid(), e);
                                 isError = true;
                             } catch (APIMigrationException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "adding API revisions, API uuid: " + apiInfoDTO.getUuid(), e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "adding API revisions, API uuid: " + apiInfoDTO.getUuid(), e);
                                 isError = true;
                             }
                         }
                     }
                 } catch (RegistryException e) {
-                    log.error("WSO2 API-M Migration Task : Error while initializing the registry, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while initializing the registry, tenant domain: "
+                            +  tenant.getDomain(), e);
                     isError = true;
                 } catch (UserStoreException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (APIManagementException e) {
-                    log.error("WSO2 API-M Migration Task : Error while Retrieving API artifact from the registry," +
-                            " tenant domain: " + tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while Retrieving API artifact from the registry,"
+                            + " tenant domain: " + tenant.getDomain(), e);
                     isError = true;
                 } finally {
                     PrivilegedCarbonContext.endTenantFlow();
@@ -578,8 +578,8 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
             isError = true;
         }
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occured during" +
-                    " API Revision related migration");
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occured during"
+                    + " API Revision related migration");
         } else {
             log.info("WSO2 API-M Migration Task : Completed API Revision related migration for all tenants");
         }
@@ -602,8 +602,8 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
             apiId = APIUtil.getAPIIdentifierFromUUID(apiRevision.getApiUUID());
         } catch (APIManagementException e) {
             throw new APIMigrationException("WSO2 API-M Migration Task : Couldn't retrieve API Identifier for from "
-                    + "revision UUID: " + apiRevision.getApiUUID() + " for tenant " + tenant.getId() + '(' +
-                    tenant.getDomain() + ')');
+                    + "revision UUID: " + apiRevision.getApiUUID() + " for tenant " + tenant.getId() + '('
+                    + tenant.getDomain() + ')');
         }
         if (apiId == null) {
             throw new APIMigrationException("WSO2 API-M Migration Task : Couldn't retrieve existing API with API "
@@ -640,9 +640,9 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
                     + tenant.getId() + '(' + tenant.getDomain() + ')');
         }
 
-        log.info("WSO2 API-M Migration Task : Storing revision artifacts of API: " + apiRevision.getApiUUID() +
-                " into gateway artifacts " + "and external server for tenant " + tenant.getId() + '(' +
-                tenant.getDomain() + ')');
+        log.info("WSO2 API-M Migration Task : Storing revision artifacts of API: " + apiRevision.getApiUUID()
+                + " into gateway artifacts " + "and external server for tenant " + tenant.getId() + '('
+                + tenant.getDomain() + ')');
 
         try {
             File artifact = importExportAPI
@@ -749,8 +749,8 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
                 artifactSaver.saveArtifact(apiRevision.getApiUUID(), apiProductIdentifier.getName(),
                         apiProductIdentifier.getVersion(), apiRevision.getRevisionUUID(), organization, artifact);
             }
-            log.info("WSO2 API-M Migration Task : Successfully added revision artifact of API Product: " +
-                    apiProductIdentifier.getUUID() + " for tenant " + tenant.getId() + '(' + tenant.getDomain() + ')');
+            log.info("WSO2 API-M Migration Task : Successfully added revision artifact of API Product: "
+                    + apiProductIdentifier.getUUID() + " for tenant " + tenant.getId() + '(' + tenant.getDomain() + ')');
         } catch (APIImportExportException | ArtifactSynchronizerException | APIManagementException e) {
             throw new APIMigrationException("WSO2 API-M Migration Task : Error while Store the Revision Artifact for "
                     + "API product: " + apiProductIdentifier.getUUID() + " for tenant " + tenant.getId() + '('
@@ -762,8 +762,8 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
     public void removeUnnecessaryFaultHandlers() throws APIMigrationException {
         boolean isError = false;
         try {
-            log.info("WSO2 API-M Migration Task : Started removing unnecessary fault handlers from fault sequences" +
-                    " for all tenants");
+            log.info("WSO2 API-M Migration Task : Started removing unnecessary fault handlers from fault sequences"
+                    + " for all tenants");
             List<Tenant> tenants = APIUtil.getAllTenantsWithSuperTenant();
             for (Tenant tenant : tenants) {
                 try {
@@ -814,8 +814,8 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
                                         Node parentNode = node.getParentNode();
                                         parentNode.removeChild(node);
                                         parentNode.normalize();
-                                        log.info("WSO2 API-M Migration Task : Removed " + namedItem.getNodeValue() +
-                                                " from sequence: " + childPath);
+                                        log.info("WSO2 API-M Migration Task : Removed " + namedItem.getNodeValue()
+                                                + " from sequence: " + childPath);
                                     }
                                 }
                                 // Convert the content to String
@@ -824,39 +824,39 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
                                 sequence.setContent(newContent);
                                 registry.put(childPath, sequence);
                             } catch (RegistryException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "retrieving/updating fault sequences, childPath: " + childPath, e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "retrieving/updating fault sequences, childPath: " + childPath, e);
                                 isError = true;
                             } catch (ParserConfigurationException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "getting new DocumentBuilder, childPath: " + childPath, e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "getting new DocumentBuilder, childPath: " + childPath, e);
                                 isError = true;
                             } catch (SAXException | IOException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "parsing fault sequences, childPath: " + childPath, e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "parsing fault sequences, childPath: " + childPath, e);
                                 isError = true;
                             } catch (Exception e) {
-                                log.error("WSO2 API-M Migration Task : Error while removing " +
-                                        "unnecessary fault handlers from fault sequences, childPath: " + childPath, e);
+                                log.error("WSO2 API-M Migration Task : Error while removing "
+                                        + "unnecessary fault handlers from fault sequences, childPath: " + childPath, e);
                                 isError = true;
                             }
                         }
                     }
                 } catch (RegistryException e) {
-                    log.error("WSO2 API-M Migration Task : Error while initializing the registry, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while initializing the registry, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (UserStoreException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (APIManagementException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving tenant admin's username, " +
-                            "tenant domain: " + tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving tenant admin's username, "
+                            + "tenant domain: " + tenant.getDomain(), e);
                     isError = true;
                 } catch (org.wso2.carbon.registry.api.RegistryException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving fault sequences, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving fault sequences, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } finally {
                     PrivilegedCarbonContext.endTenantFlow();
@@ -867,11 +867,11 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
             isError = true;
         }
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while " +
-                    "removing unnecessary fault handlers from fault sequences");
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while "
+                    + "removing unnecessary fault handlers from fault sequences");
         } else {
-            log.info("WSO2 API-M Migration Task : Completed removing unnecessary fault handlers from fault sequences" +
-                    " for all tenants");
+            log.info("WSO2 API-M Migration Task : Completed removing unnecessary fault handlers from fault sequences"
+                    + " for all tenants");
         }
     }
 

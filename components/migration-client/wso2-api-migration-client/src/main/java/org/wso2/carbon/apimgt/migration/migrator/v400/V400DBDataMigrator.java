@@ -164,25 +164,25 @@ public class V400DBDataMigrator extends Migrator {
                     try {
                         Certificate certificate = trustStore.getCertificate(alias);
                         if (certificate != null) {
+                            log.info("WSO2 API-M Migration Task : Adding encoded certificate content of alias: "
+                                    + alias + " to DB");
                             byte[] encoded = Base64.encodeBase64(certificate.getEncoded());
                             String base64EncodedString = BEGIN_CERTIFICATE_STRING.concat(new String(encoded)).concat("\n")
                                     .concat(END_CERTIFICATE_STRING);
                             base64EncodedString = Base64.encodeBase64URLSafeString(base64EncodedString.getBytes());
                             certificateMap.put(alias, base64EncodedString);
                         } else {
-                            log.error("WSO2 API-M Migration Task : Error while retrieving endpoint certificate for" +
-                                    " alias: " + alias + ". The certificate does not exist in the trust store.");
+                            log.error("WSO2 API-M Migration Task : Error while retrieving endpoint certificate for"
+                                    + " alias: " + alias + ". The certificate does not exist in the trust store.");
                             isError = true;
                         }
-                        log.info("WSO2 API-M Migration Task : Adding encoded certificate content of alias: " + alias
-                                + " to DB");
                     } catch (KeyStoreException e) {
-                        log.error("WSO2 API-M Migration Task : Error while " +
-                                "getting certificate from trust store for alias: " + alias, e);
+                        log.error("WSO2 API-M Migration Task : Error while "
+                                + "getting certificate from trust store for alias: " + alias, e);
                         isError = true;
                     } catch (CertificateException e) {
-                        log.error("WSO2 API-M Migration Task : Error while " +
-                                "encoding certificate for alias: " + alias, e);
+                        log.error("WSO2 API-M Migration Task : Error while "
+                                + "encoding certificate for alias: " + alias, e);
                         isError = true;
                     }
                 }
@@ -196,8 +196,8 @@ public class V400DBDataMigrator extends Migrator {
             isError = true;
         }
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while " +
-                    "Migrating Endpoint Certificates");
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while "
+                    + "Migrating Endpoint Certificates");
         } else {
             log.info("WSO2 API-M Migration Task : Completed Migrating Endpoint Certificates");
         }
@@ -278,24 +278,24 @@ public class V400DBDataMigrator extends Migrator {
                                 apiInfoDTO.setStatus(((GenericArtifactImpl) artifact).getLcState());
                                 apiInfoDTOList.add(apiInfoDTO);
                             } catch (GovernanceException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "fetching attributes from artifact, artifact path: " +
-                                        ((GenericArtifactImpl) artifact).getArtifactPath(), e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "fetching attributes from artifact, artifact path: "
+                                        + ((GenericArtifactImpl) artifact).getArtifactPath(), e);
                                 isError = true;
                             }
                         }
                     }
                 } catch (RegistryException e) {
-                    log.error("WSO2 API-M Migration Task : Error while initiation the registry, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while initiation the registry, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (UserStoreException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (APIManagementException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving API artifact from the registry, " +
-                            "tenant domain: " + tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving API artifact from the registry, "
+                            + "tenant domain: " + tenant.getDomain(), e);
                     isError = true;
                 } finally {
                     PrivilegedCarbonContext.endTenantFlow();
@@ -307,8 +307,8 @@ public class V400DBDataMigrator extends Migrator {
             isError = true;
         }
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while " +
-                    "adding API UUID and STATUS to AM_API table for all tenants");
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while "
+                    + "adding API UUID and STATUS to AM_API table for all tenants");
         } else {
             log.info("WSO2 API-M Migration Task : Added API UUID and STATUS to AM_API table for all tenants");
         }

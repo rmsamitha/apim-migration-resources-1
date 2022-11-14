@@ -73,8 +73,8 @@ public class V320DBDataMigrator extends Migrator {
         try {
             List<Tenant> tenants = APIUtil.getAllTenantsWithSuperTenant();
             for (Tenant tenant : tenants) {
-                log.info("WSO2 API-M Migration Task : Started updating API Type in DB " +
-                        "for tenant: " + tenant.getDomain());
+                log.info("WSO2 API-M Migration Task : Started updating API Type in DB "
+                        + "for tenant: " + tenant.getDomain());
                 List<APIInfoDTO> apiInfoDTOList = new ArrayList<>();
                 try {
                     int apiTenantId = tenantManager.getTenantId(tenant.getDomain());
@@ -109,20 +109,20 @@ public class V320DBDataMigrator extends Migrator {
                         apiMgtDAO.updateApiType(apiInfoDTOList, tenant.getId(), tenant.getDomain());
                     }
                 } catch (RegistryException e) {
-                    log.error("WSO2 API-M Migration Task : Error while initiation the registry, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while initiation the registry, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (UserStoreException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (APIManagementException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving API artifact, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving API artifact, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (APIMigrationException e) {
-                    log.error("WSO2 API-M Migration Task : Error while updating API type, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while updating API type, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } finally {
                     PrivilegedCarbonContext.endTenantFlow();
@@ -133,8 +133,8 @@ public class V320DBDataMigrator extends Migrator {
             isError = true;
         }
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred during " +
-                    "updating API Type in DB for all tenants");
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred during "
+                    + "updating API Type in DB for all tenants");
         } else {
             log.info("WSO2 API-M Migration Task : Completed updating API Type in DB for all tenants");
         }

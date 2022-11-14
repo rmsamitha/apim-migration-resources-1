@@ -59,8 +59,8 @@ public class V300RegistryResourceMigrator extends RegistryResourceMigrator {
         log.info("WSO2 API-M Migration Task : Started Updating API artifacts for all tenants");
         for (Tenant tenant : tenants) {
             registryService.startTenantFlow(tenant);
-            log.info("WSO2 API-M Migration Task : Updating APIs of tenant " + tenant.getId() +
-                    '(' + tenant.getDomain() + ')');
+            log.info("WSO2 API-M Migration Task : Updating APIs of tenant " + tenant.getId()
+                    + '(' + tenant.getDomain() + ')');
             GenericArtifact[] artifacts = registryService.getGenericAPIArtifacts();
             for (GenericArtifact artifact : artifacts) {
                 try {
@@ -74,12 +74,12 @@ public class V300RegistryResourceMigrator extends RegistryResourceMigrator {
                         registryService.updateGenericAPIArtifact(path, artifact);
                     }
                 } catch (GovernanceException e) {
-                    log.error("WSO2 API-M Migration Task : Error while accessing API artifact " +
-                            "in registry for tenant " + tenant.getId() + '(' + tenant.getDomain() + ')', e);
+                    log.error("WSO2 API-M Migration Task : Error while accessing API artifact "
+                            + "in registry for tenant " + tenant.getId() + '(' + tenant.getDomain() + ')', e);
                     isError = true;
                 } catch (RegistryException | UserStoreException e) {
-                    log.error("WSO2 API-M Migration Task : Error while updating API artifact " +
-                            "in the registry for tenant " + tenant.getId() + '(' + tenant.getDomain() + ')', e);
+                    log.error("WSO2 API-M Migration Task : Error while updating API artifact "
+                            + "in the registry for tenant " + tenant.getId() + '(' + tenant.getDomain() + ')', e);
                     isError = true;
                 }
             }
@@ -88,8 +88,8 @@ public class V300RegistryResourceMigrator extends RegistryResourceMigrator {
             registryService.endTenantFlow();
         }
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred during " +
-                    "Updating API artifacts of tenants");
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred during "
+                    + "Updating API artifacts of tenants");
         } else {
             log.info("WSO2 API-M Migration Task : Completed Updating API artifacts for all tenants");
         }
