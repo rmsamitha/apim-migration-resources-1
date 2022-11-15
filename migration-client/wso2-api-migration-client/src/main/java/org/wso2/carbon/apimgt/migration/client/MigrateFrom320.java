@@ -295,37 +295,37 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                                     tenantArtifactManager.updateGenericArtifact(apiArtifact);
                                 }
                             } catch (GovernanceException e) {
-                                String apiId = apiInfoDTO.getApiProvider() + "-" + apiInfoDTO.getApiName() + "-" +
-                                        apiInfoDTO.getApiVersion();
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "getting/setting attributes in artifact, apiId: " + apiId, e);
+                                String apiId = apiInfoDTO.getApiProvider() + "-" + apiInfoDTO.getApiName() + "-"
+                                        + apiInfoDTO.getApiVersion();
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "getting/setting attributes in artifact, apiId: " + apiId, e);
                                 isError = true;
                             } catch (APIManagementException e) {
-                                String apiId = apiInfoDTO.getApiProvider() + "-" + apiInfoDTO.getApiName() + "-" +
-                                        apiInfoDTO.getApiVersion();
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "getting tenant Admin User name from APIUtil, apiId: " + apiId, e);
+                                String apiId = apiInfoDTO.getApiProvider() + "-" + apiInfoDTO.getApiName() + "-"
+                                        + apiInfoDTO.getApiVersion();
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "getting tenant Admin User name from APIUtil, apiId: " + apiId, e);
                                 isError = true;
                             } catch (RegistryException e) {
-                                String apiId = apiInfoDTO.getApiProvider() + "-" + apiInfoDTO.getApiName() + "-" +
-                                        apiInfoDTO.getApiVersion();
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "accessing the registry, apiId: " + apiId, e);
+                                String apiId = apiInfoDTO.getApiProvider() + "-" + apiInfoDTO.getApiName() + "-"
+                                        + apiInfoDTO.getApiVersion();
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "accessing the registry, apiId: " + apiId, e);
                                 isError = true;
                             }
                         }
                     }
                 } catch (RegistryException e) {
-                    log.error("WSO2 API-M Migration Task : Error while initializing the registry, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while initializing the registry, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (UserStoreException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (APIManagementException e) {
-                    log.error("WSO2 API-M Migration Task : Error while Retrieving API artifact from the registry, " +
-                            "tenant domain: " + tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while Retrieving API artifact from the registry, "
+                            + "tenant domain: " + tenant.getDomain(), e);
                     isError = true;
                 } finally {
                     PrivilegedCarbonContext.endTenantFlow();
@@ -336,8 +336,8 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
             isError = true;
         }
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while " +
-                    "updating registry paths of API icons and WSDLs");
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while "
+                    + "updating registry paths of API icons and WSDLs");
         } else {
             log.info("WSO2 API-M Migration Task : Completed updating registry paths of API icons and WSDL for all tenants");
         }
@@ -353,8 +353,8 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                 List<Environment> dynamicEnvironments;
                 List<APIInfoDTO> apiInfoDTOList = new ArrayList<>();
                 try {
-                    log.info("WSO2 API-M Migration Task : Starting API Revision related migration for tenant " +
-                            tenant.getId() + '(' + tenant.getDomain() + ')');
+                    log.info("WSO2 API-M Migration Task : Starting API Revision related migration for tenant "
+                            + tenant.getId() + '(' + tenant.getDomain() + ')');
                     dynamicEnvironments = ApiMgtDAO.getInstance().getAllEnvironments(tenant.getDomain());
                     APIUtil.loadTenantRegistry(tenant.getId());
                     startTenantFlow(tenant.getDomain(), tenant.getId(), APIUtil.getTenantAdminUserName(tenant.getDomain()));
@@ -368,18 +368,18 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                     }
                     //On exceptions in this stage, log the error with tenant details and continue for remaining tenants
                 } catch (GovernanceException e) {
-                    log.error("WSO2 API-M Migration Task : Error while initializing the registry " + tenant.getId() +
-                            '(' + tenant.getDomain() + ')', e);
+                    log.error("WSO2 API-M Migration Task : Error while initializing the registry " + tenant.getId()
+                            + '(' + tenant.getDomain() + ')', e);
                     isError = true;
                     continue;
                 } catch (RegistryException e) {
-                    log.error("WSO2 API-M Migration Task : Error while initializing the registry " + tenant.getId() +
-                            '(' + tenant.getDomain() + ')', e);
+                    log.error("WSO2 API-M Migration Task : Error while initializing the registry " + tenant.getId()
+                            + '(' + tenant.getDomain() + ')', e);
                     isError = true;
                     continue;
                 } catch (APIManagementException e) {
-                    log.error("WSO2 API-M Migration Task : Generic API Management Exception while performing revision " +
-                            "migration for " + tenant.getId() + '(' + tenant.getDomain() + ')', e);
+                    log.error("WSO2 API-M Migration Task : Generic API Management Exception while performing revision "
+                            + "migration for " + tenant.getId() + '(' + tenant.getDomain() + ')', e);
                     isError = true;
                     continue;
                 }
@@ -422,12 +422,12 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                             }
                         }
                     } catch (GovernanceException e) {
-                        log.error("WSO2 API-M Migration Task : Error while fetching attributes from artifact: " +
-                                identifier, e);
+                        log.error("WSO2 API-M Migration Task : Error while fetching attributes from artifact: "
+                                + identifier, e);
                         isError = true;
                     } catch (APIManagementException e) {
-                        log.error("WSO2 API-M Migration Task : API Management Exception while getting API/API " +
-                                "Product from artifact: " + identifier, e);
+                        log.error("WSO2 API-M Migration Task : API Management Exception while getting API/API "
+                                + "Product from artifact: " + identifier, e);
                         isError = true;
                     }
                 }
@@ -442,16 +442,16 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                         try {
                             if (!StringUtils.equalsIgnoreCase(apiInfoDTO.getType(), APIConstants.API_PRODUCT)) {
                                 revisionId = apiProviderTenant.addAPIRevision(apiRevision, tenant.getDomain());
-                                log.info("WSO2 API-M Migration Task : Successfully created API Revision for " +
-                                        apiInfoDTO.getUuid());
+                                log.info("WSO2 API-M Migration Task : Successfully created API Revision for "
+                                        + apiInfoDTO.getUuid());
                             } else {
                                 revisionId = apiProviderTenant.addAPIProductRevision(apiRevision);
-                                log.info("WSO2 API-M Migration Task : Successfully created API Revision for " +
-                                        apiInfoDTO.getUuid());
+                                log.info("WSO2 API-M Migration Task : Successfully created API Revision for "
+                                        + apiInfoDTO.getUuid());
                             }
                         } catch (APIManagementException e) {
-                            log.error("WSO2 API-M Migration Task : Error while adding API/API Product Revision for " +
-                                    apiInfoDTO.getUuid(), e);
+                            log.error("WSO2 API-M Migration Task : Error while adding API/API Product Revision for "
+                                    + apiInfoDTO.getUuid(), e);
                             isError = true;
                             continue;
                         }
@@ -461,8 +461,8 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                         String environments = apiArtifact.getAttribute(APIConstants.API_OVERVIEW_ENVIRONMENTS);
                         String[] arrOfEnvironments = environments.split(",");
                         if ("none".equals(environments)) {
-                            log.info("WSO2 API-M Migration Task : No gateway environments are configured for API " +
-                                    apiInfoDTO.getUuid() + ". Hence revision deployment is skipped.");
+                            log.info("WSO2 API-M Migration Task : No gateway environments are configured for API "
+                                    + apiInfoDTO.getUuid() + ". Hence revision deployment is skipped.");
                         } else {
                             for (String environment : arrOfEnvironments) {
                                 APIRevisionDeployment apiRevisionDeployment = new APIRevisionDeployment();
@@ -489,8 +489,8 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                                 if (optionalEnv != null) {
                                     dynamicEnv = optionalEnv.get();
                                 } else {
-                                    log.error("WSO2 API-M Migration Task : Error while retrieving dynamic " +
-                                            "environment of the label: " + label);
+                                    log.error("WSO2 API-M Migration Task : Error while retrieving dynamic "
+                                            + "environment of the label: " + label);
                                     isError = true;
                                     continue;
                                 }
@@ -503,8 +503,8 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                                     apiRevisionDeployment.setDisplayOnDevportal(true);
                                     apiRevisionDeployments.add(apiRevisionDeployment);
                                 } else {
-                                    log.error("WSO2 API-M Migration Task : Vhosts are empty for the dynamic " +
-                                            "environment: " + dynamicEnv.getName());
+                                    log.error("WSO2 API-M Migration Task : Vhosts are empty for the dynamic "
+                                            + "environment: " + dynamicEnv.getName());
                                     isError = true;
                                 }
                             }
@@ -515,23 +515,23 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                                 if (!StringUtils.equalsIgnoreCase(apiInfoDTO.getType(), APIConstants.API_PRODUCT)) {
                                     apiProviderTenant.deployAPIRevision(apiInfoDTO.getUuid(), revisionId,
                                             apiRevisionDeployments);
-                                    log.info("WSO2 API-M Migration Task : Successfully deployed API Revision for " +
-                                            apiInfoDTO.getUuid());
+                                    log.info("WSO2 API-M Migration Task : Successfully deployed API Revision for "
+                                            + apiInfoDTO.getUuid());
                                 } else {
                                     apiProviderTenant.deployAPIProductRevision(apiInfoDTO.getUuid(), revisionId,
                                             apiRevisionDeployments);
-                                    log.info("WSO2 API-M Migration Task : Successfully deployed API Product Revision" +
-                                            " for " + apiInfoDTO.getUuid());
+                                    log.info("WSO2 API-M Migration Task : Successfully deployed API Product Revision"
+                                            + " for " + apiInfoDTO.getUuid());
                                 }
                             } catch (APIManagementException e) {
-                                log.error("WSO2 API-M Migration Task : Error while deploying API/API Product " +
-                                        "Revision for " + apiInfoDTO.getUuid(), e);
+                                log.error("WSO2 API-M Migration Task : Error while deploying API/API Product "
+                                        + "Revision for " + apiInfoDTO.getUuid(), e);
                                 isError = true;
                             }
                         }
                     } catch (GovernanceException e) {
-                        log.error("WSO2 API-M Migration Task : Error while fetching registry artifact by UUID: " +
-                                apiInfoDTO.getUuid(), e);
+                        log.error("WSO2 API-M Migration Task : Error while fetching registry artifact by UUID: "
+                                + apiInfoDTO.getUuid(), e);
                         isError = true;
                     }
                 }
@@ -541,8 +541,8 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
         }
 
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred during Revision Related " +
-                    "Migration, hence could not create/deploy revisions for some artifacts");
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred during Revision Related "
+                    + "Migration, hence could not create/deploy revisions for some artifacts");
         } else {
             log.info("WSO2 API-M Migration Task : Completed API Revision related migration for all tenants");
         }
@@ -575,25 +575,25 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                     try {
                         Certificate certificate = trustStore.getCertificate(alias);
                         if (certificate != null) {
+                            log.info("WSO2 API-M Migration Task : Adding encoded certificate content of alias: "
+                                    + alias + " to DB");
                             byte[] encoded = Base64.encodeBase64(certificate.getEncoded());
                             String base64EncodedString = BEGIN_CERTIFICATE_STRING.concat(new String(encoded)).concat("\n")
                                     .concat(END_CERTIFICATE_STRING);
                             base64EncodedString = Base64.encodeBase64URLSafeString(base64EncodedString.getBytes());
                             certificateMap.put(alias, base64EncodedString);
-                            log.info("WSO2 API-M Migration Task : Adding encoded certificate content of alias: " + alias
-                                    + " to DB");
                         } else {
-                            log.error("WSO2 API-M Migration Task : Error while retrieving endpoint certificate for" +
-                                    " alias: " + alias + ". The certificate does not exist in the trust store.");
+                            log.error("WSO2 API-M Migration Task : Error while retrieving endpoint certificate for"
+                                    + " alias: " + alias + ". The certificate does not exist in the trust store.");
                             isError = true;
                         }
                     } catch (KeyStoreException e) {
-                        log.error("WSO2 API-M Migration Task : Error while " +
-                                "getting certificate from trust store for alias: " + alias, e);
+                        log.error("WSO2 API-M Migration Task : Error while "
+                                + "getting certificate from trust store for alias: " + alias, e);
                         isError = true;
                     } catch (CertificateException e) {
-                        log.error("WSO2 API-M Migration Task : Error while " +
-                                "encoding certificate for alias: " + alias, e);
+                        log.error("WSO2 API-M Migration Task : Error while "
+                                + "encoding certificate for alias: " + alias, e);
                         isError = true;
                     }
                 }
@@ -607,8 +607,8 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
             isError = true;
         }
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred during Endpoint " +
-                    "Certificate Migration, hence could not migrate certificates for some artifacts.");
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred during Endpoint "
+                    + "Certificate Migration, hence could not migrate certificates for some artifacts.");
         } else {
             log.info("WSO2 API-M Migration Task : Completed Migrating Endpoint Certificates");
         }
@@ -679,8 +679,8 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                 }
                 environment.setVhosts(vhosts);
                 environments.add(environment);
-                log.info("WSO2 API-M Migration Task : Converting label " + labelDTO.getName() + "of tenant " +
-                        labelDTO.getTenantDomain() + " to a Vhost");
+                log.info("WSO2 API-M Migration Task : Converting label " + labelDTO.getName() + "of tenant "
+                        + labelDTO.getTenantDomain() + " to a Vhost");
             }
             // insert dynamic environments
             apiMgtDAO.addDynamicGatewayEnvironments(environments);
@@ -737,38 +737,39 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                                                 APIUtil.getTenantAdminUserName(tenant.getDomain()));
                                         apiProviderTenant.saveAsyncApiDefinition(api, apiDefinition);
                                     } else {
-                                        log.error("WSO2 API-M Migration Task : Async Api definition is not added for the API " +
-                                                artifact.getAttribute(Constants.API_OVERVIEW_NAME)
+                                        log.error("WSO2 API-M Migration Task : "
+                                                + "Async Api definition is not added for the API "
+                                                + artifact.getAttribute(Constants.API_OVERVIEW_NAME)
                                                 + " due to returned API is null");
                                         isError = true;
                                     }
                                 }
                             } catch (GovernanceException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "fetching attributes from artifact, artifact path: ", e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "fetching attributes from artifact, artifact path: ", e);
                                 isError = true;
                             } catch (APIManagementException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "generating/saving Async API Definition, artifact path: ", e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "generating/saving Async API Definition, artifact path: ", e);
                                 isError = true;
                             } catch (APIMigrationException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "accessing ApiMgtDAO for migrating WebSocket APIs, artifact path: ", e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "accessing ApiMgtDAO for migrating WebSocket APIs, artifact path: ", e);
                                 isError = true;
                             }
                         }
                     }
                 } catch (RegistryException e) {
-                    log.error("WSO2 API-M Migration Task : Error while initializing the registry, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while initializing the registry, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (UserStoreException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (APIManagementException e) {
-                    log.error("WSO2 API-M Migration Task : Error while accessing APIUtil " +
-                            "for migrating WebSocket APIs, tenant domain: " + tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while accessing APIUtil "
+                            + "for migrating WebSocket APIs, tenant domain: " + tenant.getDomain(), e);
                     isError = true;
                 } finally {
                     PrivilegedCarbonContext.endTenantFlow();
@@ -786,8 +787,8 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
             isError = true;
         }
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred " +
-                    "while migrating WebSocket APIs for all tenants");
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred "
+                    + "while migrating WebSocket APIs for all tenants");
         } else {
             log.info("WSO2 API-M Migration Task : Completed migrating WebSocket APIs for all tenants");
         }
@@ -795,13 +796,13 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
 
     public void removeUnnecessaryFaultHandlers() throws APIMigrationException {
         boolean isError = false;
-        log.info("WSO2 API-M Migration Task : Started removing unnecessary fault handlers from fault sequences" +
-                " for all tenants");
+        log.info("WSO2 API-M Migration Task : Started removing unnecessary fault handlers from fault sequences"
+                + " for all tenants");
         try {
             List<Tenant> tenants = APIUtil.getAllTenantsWithSuperTenant();
             for (Tenant tenant : tenants) {
-                log.info("WSO2 API-M Migration Task : Started removing unnecessary fault handlers " +
-                        "from fault sequences for tenant: " + tenant.getId() + '(' + tenant.getDomain() + ')');
+                log.info("WSO2 API-M Migration Task : Started removing unnecessary fault handlers "
+                        + "from fault sequences for tenant: " + tenant.getId() + '(' + tenant.getDomain() + ')');
                 try {
                     int apiTenantId = tenantManager.getTenantId(tenant.getDomain());
                     APIUtil.loadTenantRegistry(apiTenantId);
@@ -857,39 +858,39 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                                 sequence.setContent(newContent);
                                 registry.put(childPath, sequence);
                             } catch (RegistryException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "retrieving/updating fault sequences, childPath: " + childPath, e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "retrieving/updating fault sequences, childPath: " + childPath, e);
                                 isError = true;
                             } catch (ParserConfigurationException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "getting new DocumentBuilder, childPath: " + childPath, e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "getting new DocumentBuilder, childPath: " + childPath, e);
                                 isError = true;
                             } catch (SAXException | IOException e) {
-                                log.error("WSO2 API-M Migration Task : Error while " +
-                                        "parsing fault sequences, childPath: " + childPath, e);
+                                log.error("WSO2 API-M Migration Task : Error while "
+                                        + "parsing fault sequences, childPath: " + childPath, e);
                                 isError = true;
                             } catch (Exception e) {
-                                log.error("WSO2 API-M Migration Task : Error while removing " +
-                                        "unnecessary fault handlers from fault sequences, childPath: " + childPath, e);
+                                log.error("WSO2 API-M Migration Task : Error while removing "
+                                        + "unnecessary fault handlers from fault sequences, childPath: " + childPath, e);
                                 isError = true;
                             }
                         }
                     }
                 } catch (RegistryException e) {
-                    log.error("WSO2 API-M Migration Task : Error while initializing the registry, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while initializing the registry, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (UserStoreException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (APIManagementException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving tenant admin's username, " +
-                            "tenant domain: " + tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving tenant admin's username, "
+                            + "tenant domain: " + tenant.getDomain(), e);
                     isError = true;
                 } catch (org.wso2.carbon.registry.api.RegistryException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving fault sequences, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving fault sequences, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } finally {
                     PrivilegedCarbonContext.endTenantFlow();
@@ -901,11 +902,11 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
             isError = true;
         }
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while " +
-                    "removing unnecessary fault handlers from fault sequences");
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while "
+                    + "removing unnecessary fault handlers from fault sequences");
         } else {
-            log.info("WSO2 API-M Migration Task : Completed removing unnecessary fault handlers from fault sequences" +
-                    " for all tenants");
+            log.info("WSO2 API-M Migration Task : Completed removing unnecessary fault handlers from fault sequences"
+                    + " for all tenants");
         }
     }
 

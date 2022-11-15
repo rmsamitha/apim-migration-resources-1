@@ -97,16 +97,16 @@ public class MigrateUUIDToDB extends MigrationClientBase{
                         }
                     }
                 } catch (RegistryException e) {
-                    log.error("WSO2 API-M Migration Task : Error while initiation the registry, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while initiation the registry, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (UserStoreException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: " +
-                            tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving the tenant ID, tenant domain: "
+                            + tenant.getDomain(), e);
                     isError = true;
                 } catch (APIManagementException e) {
-                    log.error("WSO2 API-M Migration Task : Error while retrieving API artifact from the registry, " +
-                            "tenant domain: " + tenant.getDomain(), e);
+                    log.error("WSO2 API-M Migration Task : Error while retrieving API artifact from the registry, "
+                            + "tenant domain: " + tenant.getDomain(), e);
                     isError = true;
                 } finally {
                     PrivilegedCarbonContext.endTenantFlow();
@@ -119,8 +119,8 @@ public class MigrateUUIDToDB extends MigrationClientBase{
             isError = true;
         }
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while " +
-                    "adding API UUID and STATUS to AM_API table for all tenants");
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred while "
+                    + "adding API UUID and STATUS to AM_API table for all tenants");
         } else {
             log.info("WSO2 API-M Migration Task : Added API UUID and STATUS to AM_API table for all tenants");
         }
