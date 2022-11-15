@@ -406,14 +406,15 @@ public abstract class MigrationClientBase {
      * @throws APIMigrationException
      */
     public void updateGenericAPIArtifacts(RegistryService registryService) throws APIMigrationException {
+        boolean isError = false;
         log.info("WSO2 API-M Migration Task : Start updating registry API artifacts");
         for (Tenant tenant : getTenantsArray()) {
-            try {
-                registryService.startTenantFlow(tenant);
-                log.info("WSO2 API-M Migration Task : Updating API artifacts for tenant " + tenant.getId() +
-                        '(' + tenant.getDomain() + ')');
-                GenericArtifact[] artifacts = registryService.getGenericAPIArtifacts();
-                for (GenericArtifact artifact : artifacts) {
+            registryService.startTenantFlow(tenant);
+            log.info("WSO2 API-M Migration Task : Updating API artifacts for tenant " + tenant.getId()
+                    + '(' + tenant.getDomain() + ')');
+            GenericArtifact[] artifacts = registryService.getGenericAPIArtifacts();
+            for (GenericArtifact artifact : artifacts) {
+                try {
                     String path = artifact.getPath();
                     if (registryService.isGovernanceRegistryResourceExists(path)) {
                         Object apiResource = registryService.getGovernanceRegistryResource(path);
@@ -422,21 +423,27 @@ public abstract class MigrationClientBase {
                         }
                         registryService.updateGenericAPIArtifactsForAccessControl(path, artifact);
                         registryService.updateGenericAPIArtifact(path, artifact);
-                        registryService.updateEnableStoreInRxt(path,artifact);
+                        registryService.updateEnableStoreInRxt(path, artifact);
                     }
+                } catch (GovernanceException e) {
+                    log.error("WSO2 API-M Migration Task : Error while accessing API artifact "
+                            + "in registry for tenant " + tenant.getId() + '(' + tenant.getDomain() + ')', e);
+                    isError = true;
+                } catch (RegistryException | UserStoreException e) {
+                    log.error("WSO2 API-M Migration Task : Error while updating API artifact "
+                            + "in the registry for tenant " + tenant.getId() + '(' + tenant.getDomain() + ')', e);
+                    isError = true;
                 }
-                log.info("WSO2 API-M Migration Task : Completed Updating API artifacts for tenant" + tenant.getId()
-                        + '(' + tenant.getDomain() + ')');
-            } catch (GovernanceException e) {
-                log.error("WSO2 API-M Migration Task : Error while accessing API artifact in registry for tenant "
-                        + tenant.getId() + '(' + tenant.getDomain() + ')', e);
-            } catch (RegistryException | UserStoreException e) {
-                log.error("WSO2 API-M Migration Task : Error while updating API artifact in the registry for tenant "
-                        + tenant.getId() + '(' + tenant.getDomain() + ')', e);
-            } finally {
-                registryService.endTenantFlow();
             }
-            log.info("WSO2 API-M Migration Task : RXT resource migration done for all the tenants");
+            log.info("WSO2 API-M Migration Task : Completed Updating API artifacts for tenant" + tenant.getId()
+                    + '(' + tenant.getDomain() + ')');
+            registryService.endTenantFlow();
+        }
+        if (isError) {
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred during "
+                    + "Updating API artifacts of tenants");
+        } else {
+            log.info("WSO2 API-M Migration Task : Completed Updating registry API artifacts");
         }
     }
 
@@ -515,11 +522,11 @@ public abstract class MigrationClientBase {
                         log.info("WSO2 API-M Migration Task : Successfully migrated debug_json_fault.xml in registry"
                                 + " for tenant: " + tenant.getDomain() + ", tenant id: " + tenant.getId());
                     } catch (UserStoreException e) {
-                        log.error("Error in updating debug_json_fault.xml in registry for tenant: " +
-                                tenant.getDomain() + ", tenant id: " + tenant.getId(), e);
+                        log.error("Error in updating debug_json_fault.xml in registry for tenant: "
+                                + tenant.getDomain() + ", tenant id: " + tenant.getId(), e);
                     } catch (RegistryException e) {
-                        log.error("Error in updating debug_json_fault.xml in registry for tenant: " +
-                                tenant.getDomain() + ", tenant id: " + tenant.getId(), e);
+                        log.error("Error in updating debug_json_fault.xml in registry for tenant: "
+                                + tenant.getDomain() + ", tenant id: " + tenant.getId(), e);
                     }
                 }
             } finally {
