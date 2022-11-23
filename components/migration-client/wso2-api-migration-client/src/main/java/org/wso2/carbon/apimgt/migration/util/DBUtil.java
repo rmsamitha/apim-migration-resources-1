@@ -36,23 +36,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-public class AMDBUtil {
-    private static final Log log = LogFactory.getLog(AMDBUtil.class);
+public class DBUtil {
+    private static final Log log = LogFactory.getLog(DBUtil.class);
 
-    public static void runSQLScript(String sqlScriptPath, boolean isPathProvided) throws SQLException {
+    public static void runSQLScript(String sqlScriptPath, boolean isPathProvided, Connection connection)
+            throws SQLException {
+
         log.info("WSO2 API-M Migration Task : Executing SQL script at " + sqlScriptPath);
-        Connection connection = null;
         PreparedStatement preparedStatement = null;
         Statement statement = null;
         try {
-            connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(false);
             String dbType = MigrationDBCreator.getDatabaseType(connection);
             String dbScriptPath;
             if (isPathProvided) {
                 dbScriptPath = sqlScriptPath;
             } else {
-                dbScriptPath = sqlScriptPath +  dbType + ".sql";
+                dbScriptPath = sqlScriptPath + dbType + ".sql";
             }
             InputStream is = new FileInputStream(dbScriptPath);
             List<String> sqlStatements = readSQLStatements(is, dbType);
@@ -67,7 +67,7 @@ public class AMDBUtil {
                 }
             }
             connection.commit();
-        }  catch (Exception e) {
+        } catch (Exception e) {
             /* MigrationDBCreator extends from org.wso2.carbon.utils.dbcreator.DatabaseCreator and in the super class
             method getDatabaseType throws generic Exception */
             log.error("WSO2 API-M Migration Task : Error occurred while migrating databases", e);
@@ -147,7 +147,7 @@ public class AMDBUtil {
                 }
             }
             bufferedReader.close();
-        }  catch (IOException e) {
+        } catch (IOException e) {
             log.error("Error while reading SQL statements from stream", e);
         }
         return sqlStatements;

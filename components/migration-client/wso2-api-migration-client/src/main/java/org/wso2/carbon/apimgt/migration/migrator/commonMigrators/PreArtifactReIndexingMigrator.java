@@ -19,23 +19,30 @@ package org.wso2.carbon.apimgt.migration.migrator.commonMigrators;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.migration.APIMigrationException;
-import org.wso2.carbon.apimgt.migration.dao.SharedDAO;
 import org.wso2.carbon.apimgt.migration.migrator.Migrator;
 import org.wso2.carbon.apimgt.migration.util.Constants;
+import org.wso2.carbon.apimgt.migration.util.DBUtil;
+import org.wso2.carbon.apimgt.migration.util.RegDBUtil;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * Class to run artifact re-indexing scripts post-migration
  */
-public class ArtifactReIndexingMigrator extends Migrator {
-    private static final Log log = LogFactory.getLog(ArtifactReIndexingMigrator.class);
+public class PreArtifactReIndexingMigrator extends Migrator {
+    private static final Log log = LogFactory.getLog(PreArtifactReIndexingMigrator.class);
 
     @Override
     public void migrate() throws APIMigrationException {
+        //TODO:fix method name, class name
         log.info("WSO2 API-M Migration Task : Artifact re-indexing migrator started");
         try {
-            SharedDAO.getInstance().runSQLScript(Constants.ARTIFACT_REINDEXING_SCRIPT_PATH);
+            Map<String, DataSource> dataSourceMap = RegDBUtil.getDataSources();
+            for (DataSource dataSource : dataSourceMap.values()) {
+                DBUtil.runSQLScript(Constants.ARTIFACT_REINDEXING_SCRIPT_PATH, false, dataSource.getConnection());
+            }
         } catch (SQLException e) {
             log.error("WSO2 API-M Migration Task : Error running the artifact re-indexing script", e);
         }

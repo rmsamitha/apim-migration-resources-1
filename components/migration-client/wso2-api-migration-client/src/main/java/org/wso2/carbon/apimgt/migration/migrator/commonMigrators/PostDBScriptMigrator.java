@@ -18,23 +18,26 @@ package org.wso2.carbon.apimgt.migration.migrator.commonMigrators;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.apimgt.migration.util.AMDBUtil;
+import org.wso2.carbon.apimgt.impl.utils.APIMgtDBUtil;
+import org.wso2.carbon.apimgt.migration.util.DBUtil;
 
 import java.sql.SQLException;
 
 /**
- * Class to run post-migration DB scripts from version to version
+ * Class to run post-migration DB scripts from version to version.
  */
 public class PostDBScriptMigrator {
     private String scriptPath;
+
     public PostDBScriptMigrator(String scriptPath) {
         this.scriptPath = scriptPath;
     }
+
     private static final Log log = LogFactory.getLog(PostDBScriptMigrator.class);
 
     public void run() {
         try {
-            AMDBUtil.runSQLScript(scriptPath, false);
+            DBUtil.runSQLScript(scriptPath, false, APIMgtDBUtil.getConnection());
         } catch (SQLException e) {
             log.error("WSO2 API-M Migration Task : Error while running AM_DB post migration SQL scripts ", e);
         }

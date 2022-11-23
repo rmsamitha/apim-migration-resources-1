@@ -20,9 +20,10 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.apimgt.migration.migrator.VersionMigrationHolder;
 import org.wso2.carbon.apimgt.migration.migrator.VersionMigrator;
-import org.wso2.carbon.apimgt.migration.migrator.commonMigrators.ArtifactReIndexingMigrator;
+import org.wso2.carbon.apimgt.migration.migrator.commonMigrators.PreArtifactReIndexingMigrator;
 import org.wso2.carbon.apimgt.migration.util.Constants;
-import org.wso2.carbon.apimgt.migration.util.SharedDBUtil;
+import org.wso2.carbon.apimgt.migration.util.RegDBUtil;
+import org.wso2.carbon.apimgt.migration.util.UserDBUtil;
 import org.wso2.carbon.apimgt.migration.validator.ValidationHandler;
 import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.user.api.UserStoreException;
@@ -40,7 +41,8 @@ public class APIMMigrationClient implements ServerStartupObserver {
     public void completedServerStartup() {
         try {
             APIMgtDBUtil.initialize();
-            SharedDBUtil.initialize();
+            UserDBUtil.initialize();
+            RegDBUtil.initialize();
         } catch (Exception e) {
             log.error("WSO2 API-M Migration Task : Error occurred while initializing DB Util ", e);
         }
@@ -63,7 +65,7 @@ public class APIMMigrationClient implements ServerStartupObserver {
             } catch (APIMigrationException e) {
                 log.error("WSO2 API-M Migration Task : API Migration exception occurred while migrating", e);
             }
-            ArtifactReIndexingMigrator artifactReIndexingMigrator = new ArtifactReIndexingMigrator();
+            PreArtifactReIndexingMigrator artifactReIndexingMigrator = new PreArtifactReIndexingMigrator();
             try {
                 artifactReIndexingMigrator.migrate();
             } catch (APIMigrationException e) {
