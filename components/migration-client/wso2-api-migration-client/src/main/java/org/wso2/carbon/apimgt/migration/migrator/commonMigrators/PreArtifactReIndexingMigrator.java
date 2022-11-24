@@ -29,23 +29,30 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
- * Class to run artifact re-indexing scripts post-migration
+ * Class to run artifact re-indexing scripts post-migration.
  */
 public class PreArtifactReIndexingMigrator extends Migrator {
     private static final Log log = LogFactory.getLog(PreArtifactReIndexingMigrator.class);
 
     @Override
     public void migrate() throws APIMigrationException {
-        //TODO:fix method name, class name
-        log.info("WSO2 API-M Migration Task : Artifact re-indexing migrator started");
+        log.info("WSO2 API-M Migration Task : Pre Artifact re-indexing migrator to clear REG_LOG table started");
         try {
             Map<String, DataSource> dataSourceMap = RegDBUtil.getDataSources();
-            for (DataSource dataSource : dataSourceMap.values()) {
-                DBUtil.runSQLScript(Constants.ARTIFACT_REINDEXING_SCRIPT_PATH, false, dataSource.getConnection());
+            for (Map.Entry<String, DataSource> dataSource : dataSourceMap.entrySet()) {
+                log.info("WSO2 API-M Migration Task : Executing the PreArtifactReIndexingMigrator for REG_DB.REG_LOG "
+                        + "table cleanup SQL script at " + Constants.ARTIFACT_REINDEXING_SCRIPT_PATH
+                        + " for registry datasource: " + dataSource.getKey());
+                DBUtil.runSQLScript(Constants.ARTIFACT_REINDEXING_SCRIPT_PATH, false,
+                        dataSource.getValue().getConnection());
+                log.info("WSO2 API-M Migration Task : Successfully executed the PreArtifactReIndexingMigrator for "
+                        + "REG_DB.REG_LOG table cleanup SQL script at " + Constants.ARTIFACT_REINDEXING_SCRIPT_PATH
+                        + " for registry datasource: " + dataSource.getKey());
             }
         } catch (SQLException e) {
-            log.error("WSO2 API-M Migration Task : Error running the artifact re-indexing script", e);
+            log.error("WSO2 API-M Migration Task : Error running the artifact re-indexing script to clear "
+                    + "REG_LOB table", e);
         }
-        log.info("WSO2 API-M Migration Task : Artifact re-indexing migrator completed");
+        log.info("WSO2 API-M Migration Task : Pre Artifact re-indexing migrator to clear REG_LOG table completed");
     }
 }

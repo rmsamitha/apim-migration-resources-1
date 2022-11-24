@@ -47,20 +47,27 @@ public class PreDBScriptMigrator {
         try {
             //run pre migration scripts on AM_DB
             if (apimgtScriptPath != null) {
+                log.info("WSO2 API-M Migration Task : Executing the PreDBScriptMigrator for AM_DB SQL script at "
+                        + apimgtScriptPath);
                 DBUtil.runSQLScript(apimgtScriptPath, false, APIMgtDBUtil.getConnection());
+                log.info("WSO2 API-M Migration Task : Successfully executed the PreDBScriptMigrator for AM_DB SQL "
+                        + "script at " + apimgtScriptPath);
             }
             //run pre migration scripts on REG_DB
             if (regScriptPath != null) {
                 //get all the reg data sources configured in registry.xml except for wso2registry dbConfig
                 Map<String, DataSource> dataSourceMap = RegDBUtil.getDataSources();
-                for (DataSource dataSource : dataSourceMap.values()) {
-                    log.info("WSO2 API-M Migration Task : Running the REG_DB pre migration SQL script for registry " +
-                            "database" + dataSource.getConnection());
-                    DBUtil.runSQLScript(regScriptPath, false, dataSource.getConnection());
+                for (Map.Entry<String, DataSource> dataSource : dataSourceMap.entrySet()) {
+                    log.info("WSO2 API-M Migration Task : Executing the PreDBScriptMigrator for REG_DB SQL script at "
+                            + regScriptPath + " for registry datasource: " + dataSource.getKey());
+                    DBUtil.runSQLScript(regScriptPath, false, dataSource.getValue().getConnection());
+                    log.info("WSO2 API-M Migration Task : Successfully executed the PreDBScriptMigrator for REG_DB SQL "
+                            + "script at " + regScriptPath + " for registry datasource: " + dataSource.getKey());
                 }
             }
         } catch (SQLException e) {
-            log.error("WSO2 API-M Migration Task : Error while running AM_DB pre migration SQL script at " + apimgtScriptPath, e);
+            log.error("WSO2 API-M Migration Task : Error while running AM_DB pre migration SQL script at "
+                    + apimgtScriptPath, e);
         }
     }
 }

@@ -69,6 +69,13 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>${project.basedir}/src/main/resources/pre-migration-scripts/migration-3.1.0_to_3.2.0/reg</directory>
+            <outputDirectory>wso2am-migration-${project.version}/migration-resources/migration-scripts/pre-migration-scripts/migration-3.1.0_to_3.2.0/reg</outputDirectory>
+            <includes>
+                <include>*.sql</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>${project.basedir}/src/main/resources/pre-migration-scripts/migration-3.2.0_to_4.0.0</directory>
             <outputDirectory>wso2am-migration-${project.version}/migration-resources/migration-scripts/pre-migration-scripts/migration-3.2.0_to_4.0.0</outputDirectory>
             <includes>
