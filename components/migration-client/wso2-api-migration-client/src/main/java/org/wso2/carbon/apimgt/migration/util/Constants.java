@@ -427,7 +427,10 @@ public class Constants {
             + "migration-4.0.0_to_4.1.0" + File.separator + "am_db" + File.separator;
 
     public static final String ARTIFACT_REINDEXING_SCRIPT_PATH = POST_MIGRATION_SCRIPT_DIR + "common" + File.separator
-            + "reg_db" + File.separator + "reg-index.sql";
+            + "reg_db" + File.separator;
+
+    public static final String V320_PRE_MIGRATION_REG_SCRIPTS_PATH = V320_PRE_MIGRATION_SCRIPTS_PATH + "reg"
+            + File.separator;
 
     // RXT file paths
     public static String RXT_DIR = CarbonUtils.getCarbonHome() + File.separator + "migration-resources" + File.separator

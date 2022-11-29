@@ -26,7 +26,7 @@ import org.wso2.carbon.apimgt.migration.APIMigrationException;
 import org.wso2.carbon.apimgt.migration.client.internal.ServiceHolder;
 import org.wso2.carbon.apimgt.migration.migrator.Migrator;
 import org.wso2.carbon.apimgt.migration.migrator.Utility;
-import org.wso2.carbon.apimgt.migration.dao.SharedDAO;
+import org.wso2.carbon.apimgt.migration.dao.UMDAO;
 import org.wso2.carbon.apimgt.migration.dto.UserRoleFromPermissionDTO;
 import org.wso2.carbon.apimgt.migration.util.Constants;
 import org.wso2.carbon.apimgt.migration.util.RegistryServiceImpl;
@@ -67,26 +67,26 @@ public class PopulateScopeRoleMappingMigrator extends Migrator {
                 log.info("WSO2 API-M Migration Task : Updating user roles for tenant " + tenant.getId() + '(' + tenant.getDomain() + ')');
 
                 // Retrieve user roles which has create permission
-                List<UserRoleFromPermissionDTO> userRolesListWithCreatePermission = SharedDAO.getInstance()
+                List<UserRoleFromPermissionDTO> userRolesListWithCreatePermission = UMDAO.getInstance()
                         .getRoleNamesMatchingPermission(Constants.API_CREATE, tenant.getId());
 
                 // Retrieve user roles which has publish permission
-                List<UserRoleFromPermissionDTO> userRolesListWithPublishPermission = SharedDAO.getInstance()
+                List<UserRoleFromPermissionDTO> userRolesListWithPublishPermission = UMDAO.getInstance()
                         .getRoleNamesMatchingPermission(Constants.API_PUBLISH, tenant.getId());
 
                 // Retrieve user roles which has subscribe permission
-                List<UserRoleFromPermissionDTO> userRolesListWithSubscribePermission = SharedDAO.getInstance()
+                List<UserRoleFromPermissionDTO> userRolesListWithSubscribePermission = UMDAO.getInstance()
                         .getRoleNamesMatchingPermission(Constants.API_SUBSCRIBE, tenant.getId());
 
                 // Retrieve user roles which has manage API permission
-                List<UserRoleFromPermissionDTO> userRolesListWithManageAPIPermission = SharedDAO.getInstance()
+                List<UserRoleFromPermissionDTO> userRolesListWithManageAPIPermission = UMDAO.getInstance()
                         .getRoleNamesMatchingPermission(Constants.API_MANAGE, tenant.getId());
                 userRolesListWithCreatePermission.addAll(userRolesListWithManageAPIPermission);
                 userRolesListWithPublishPermission.addAll(userRolesListWithManageAPIPermission);
                 userRolesListWithSubscribePermission.addAll(userRolesListWithManageAPIPermission);
 
                 // Retrieve user roles which has admin permissions
-                List<UserRoleFromPermissionDTO> userRolesListWithAdminPermission = SharedDAO.getInstance()
+                List<UserRoleFromPermissionDTO> userRolesListWithAdminPermission = UMDAO.getInstance()
                         .getRoleNamesMatchingPermissions(Utility.makePermissionsStringByEscapingSlash(
                                 Constants.APIM_ADMIN, "/permission"), tenant.getId());
 

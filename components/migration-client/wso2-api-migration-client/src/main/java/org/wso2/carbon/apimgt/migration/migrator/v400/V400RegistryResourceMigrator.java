@@ -578,7 +578,7 @@ public class V400RegistryResourceMigrator extends RegistryResourceMigrator {
             isError = true;
         }
         if (isError) {
-            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occured during"
+            throw new APIMigrationException("WSO2 API-M Migration Task : Error/s occurred during"
                     + " API Revision related migration");
         } else {
             log.info("WSO2 API-M Migration Task : Completed API Revision related migration for all tenants");

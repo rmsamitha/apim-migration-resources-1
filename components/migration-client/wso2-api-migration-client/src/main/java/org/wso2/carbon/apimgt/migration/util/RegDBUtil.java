@@ -1,0 +1,62 @@
+/*
+ *  Copyright (c) 2022, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.wso2.carbon.apimgt.migration.util;
+
+import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.migration.APIMigrationException;
+import org.wso2.carbon.registry.core.config.DataBaseConfiguration;
+import org.wso2.carbon.registry.core.config.RegistryContext;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+public class RegDBUtil {
+    private static Map<String, DataSource> dataSources = new HashMap<>();
+
+    public static void initialize() throws APIManagementException {
+
+        RegistryContext regContext = RegistryContext.getBaseInstance();
+        Iterator<String> dbConfigNames = regContext.getDBConfigNames();
+        try {
+            while (dbConfigNames.hasNext()) {
+                String dbConfigName = dbConfigNames.next();
+                if (!"wso2registry".equals(dbConfigName)) {
+                    DataBaseConfiguration dbConfig = regContext.getDBConfig(dbConfigName);
+                    String dataSourceName = dbConfig.getDataSourceName();
+                    Context context = new InitialContext();
+                    DataSource dataSource = (DataSource) context.lookup(dataSourceName);
+                    dataSources.put(dataSourceName, dataSource);
+                }
+            }
+        } catch (NamingException e) {
+            throw new APIManagementException("Error while initializing registry data-sources", e);
+        }
+    }
+
+    public static Map<String, DataSource> getDataSources() {
+        return dataSources;
+    }
+}

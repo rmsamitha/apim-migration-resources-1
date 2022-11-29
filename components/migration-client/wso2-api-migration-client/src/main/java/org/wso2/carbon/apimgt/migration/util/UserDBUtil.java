@@ -30,9 +30,9 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public final class SharedDBUtil {
+public final class UserDBUtil {
 
-    private static final Log log = LogFactory.getLog(SharedDBUtil.class);
+    private static final Log log = LogFactory.getLog(UserDBUtil.class);
     private static volatile DataSource dataSource = null;
 
     /**
