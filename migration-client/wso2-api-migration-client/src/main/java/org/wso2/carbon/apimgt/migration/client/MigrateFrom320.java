@@ -211,6 +211,10 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                             APIConstants.API_KEY);
                     if (tenantArtifactManager != null) {
                         GenericArtifact[] tenantArtifacts = tenantArtifactManager.getAllGenericArtifacts();
+                        if (tenantArtifacts == null || tenantArtifacts.length == 0) {
+                            // skipping the artifact migration, since there are no artifacts
+                            continue;
+                        }
                         for (GenericArtifact artifact : tenantArtifacts) {
                             try {
                                 API api = APIUtil.getAPI(artifact);
@@ -365,6 +369,12 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                         tenantArtifacts = tenantArtifactManager.getAllGenericArtifacts();
                         apiProviderTenant = APIManagerFactory.getInstance().getAPIProvider(
                                 APIUtil.getTenantAdminUserName(tenant.getDomain()));
+                        if (tenantArtifacts == null || tenantArtifacts.length == 0) {
+                            // skipping the artifact migration, since there are no artifacts
+                            continue;
+                        }
+                    } else {
+                        continue;
                     }
                     //On exceptions in this stage, log the error with tenant details and continue for remaining tenants
                 } catch (GovernanceException e) {
@@ -717,6 +727,10 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                             APIConstants.API_KEY);
                     if (tenantArtifactManager != null) {
                         GenericArtifact[] tenantArtifacts = tenantArtifactManager.getAllGenericArtifacts();
+                        if (tenantArtifacts == null || tenantArtifacts.length == 0) {
+                            // skipping the artifact migration, since there are no artifacts
+                            continue;
+                        }
                         for (GenericArtifact artifact : tenantArtifacts) {
                             try {
                                 if (StringUtils.equalsIgnoreCase(artifact.getAttribute(APIConstants.API_OVERVIEW_TYPE),

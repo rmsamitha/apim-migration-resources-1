@@ -337,6 +337,9 @@ public class MigrateFrom310 extends MigrationClientBase implements MigrationClie
                             APIConstants.API_KEY);
                     if (tenantArtifactManager != null) {
                         GenericArtifact[] tenantArtifacts = tenantArtifactManager.getAllGenericArtifacts();
+                        if (tenantArtifacts == null || tenantArtifacts.length == 0) {
+                            continue;
+                        }
                         for (GenericArtifact artifact : tenantArtifacts) {
                             try {
                                 String artifactPath = ((GenericArtifactImpl) artifact).getArtifactPath();

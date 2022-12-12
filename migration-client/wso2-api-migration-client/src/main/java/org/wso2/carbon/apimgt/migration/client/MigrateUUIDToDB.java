@@ -78,6 +78,9 @@ public class MigrateUUIDToDB extends MigrationClientBase{
                             APIConstants.API_KEY);
                     if (tenantArtifactManager != null) {
                         GenericArtifact[] tenantArtifacts = tenantArtifactManager.getAllGenericArtifacts();
+                        if (tenantArtifacts == null || tenantArtifacts.length == 0) {
+                            continue;
+                        }
                         for (GenericArtifact artifact : tenantArtifacts) {
                             try {
                                 API api = APIUtil.getAPI(artifact);

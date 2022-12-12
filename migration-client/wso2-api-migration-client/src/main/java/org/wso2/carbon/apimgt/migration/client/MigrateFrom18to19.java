@@ -260,6 +260,9 @@ public class MigrateFrom18to19 extends MigrationClientBase implements MigrationC
                 if (artifactManager != null) {
                     GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
                     GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
+                    if (artifacts == null || artifacts.length == 0) {
+                        continue;
+                    }
                     for (GenericArtifact artifact : artifacts) {
                         try {
                             API api = APIUtil.getAPI(artifact, registry);
@@ -1071,7 +1074,13 @@ public class MigrateFrom18to19 extends MigrationClientBase implements MigrationC
                         .getId());
                 GenericArtifactManager manager = new GenericArtifactManager(registry, "api");
                 GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
+                if (manager == null) {
+                    continue;
+                }
                 GenericArtifact[] artifacts = manager.getAllGenericArtifacts();
+                if (artifacts == null || artifacts.length == 0) {
+                    continue;
+                }
 
                 for (GenericArtifact artifact : artifacts) {
                     try {

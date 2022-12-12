@@ -132,6 +132,11 @@ public class ValidationHandler {
                 String artifactPath = "";
                 log.info("Starting " + preMigrationStep + " for tenant " + tenant.getId() +
                         "(" + tenant.getDomain() + ")" + "..........");
+                if (artifacts == null || artifacts.length == 0) {
+                    log.info("No API artifacts found in registry for tenant " + tenant.getId() + '(' + tenant.getDomain()
+                            + ')');
+                    return;
+                }
                 for (GenericArtifact artifact : artifacts) {
                     try {
                         artifactPath = ((GenericArtifactImpl) artifact).getArtifactPath();
