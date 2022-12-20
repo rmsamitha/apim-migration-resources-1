@@ -362,6 +362,9 @@ public class MigrateFrom310 extends MigrationClientBase implements MigrationClie
                         }
                         APIMgtDAO apiMgtDAO = APIMgtDAO.getInstance();
                         apiMgtDAO.updateAPIType(apiInfoDTOList, tenant.getId(), tenant.getDomain());
+                    } else {
+                        log.info("WSO2 API-M Migration Task : updating API Type in DB, skipped for tenant: "
+                                + tenant.getId() + "(" + tenant.getDomain() + ") as no api artifacts found in registry");
                     }
                 } catch (RegistryException e) {
                     log.error("WSO2 API-M Migration Task : Error while initiation the registry, tenant domain: "

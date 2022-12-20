@@ -98,6 +98,9 @@ public class MigrateUUIDToDB extends MigrationClientBase{
                                 isError = true;
                             }
                         }
+                    } else {
+                        log.info("WSO2 API-M Migration Task : Adding API UUID and STATUS to AM_API table, skipped for tenant: "
+                                + tenant.getId() + "(" + tenant.getDomain() + ") as no api artifacts found in registry");
                     }
                 } catch (RegistryException e) {
                     log.error("WSO2 API-M Migration Task : Error while initiation the registry, tenant domain: "

@@ -374,6 +374,8 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                             continue;
                         }
                     } else {
+                        log.info("WSO2 API-M Migration Task : API Revision related migration skipped for tenant: "
+                                + tenant.getId() + "(" + tenant.getDomain() + ") as no api artifacts found in registry" );
                         continue;
                     }
                     //On exceptions in this stage, log the error with tenant details and continue for remaining tenants
@@ -772,6 +774,9 @@ public class MigrateFrom320 extends MigrationClientBase implements MigrationClie
                                 isError = true;
                             }
                         }
+                    } else {
+                        log.info("WSO2 API-M Migration Task : Migrating WebSocket APIs, skipped for tenant: "
+                                + tenant.getId() + "(" + tenant.getDomain() + ") as no api artifacts found in registry");
                     }
                 } catch (RegistryException e) {
                     log.error("WSO2 API-M Migration Task : Error while initializing the registry, tenant domain: "
