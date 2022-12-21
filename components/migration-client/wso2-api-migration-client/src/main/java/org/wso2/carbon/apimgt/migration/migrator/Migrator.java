@@ -20,9 +20,11 @@ package org.wso2.carbon.apimgt.migration.migrator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.migration.APIMigrationException;
 import org.wso2.carbon.apimgt.migration.client.internal.ServiceHolder;
 import org.wso2.carbon.apimgt.migration.util.Constants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.api.Tenant;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.tenant.TenantManager;
@@ -44,7 +46,6 @@ public abstract class Migrator {
 
     /**
      * Migrator specific implementation.
-     *
      */
     public abstract void migrate() throws APIMigrationException;
 
@@ -113,17 +114,48 @@ public abstract class Migrator {
             tenantsArray.add(superTenant);
         }
 
-        log.debug("Setting tenant admin names");
+        log.info("Setting tenant admin names....");
 
         for (int i = 0; i < tenantsArray.size(); ++i) {
             Tenant tenant = tenantsArray.get(i);
             if (tenant.getId() == MultitenantConstants.SUPER_TENANT_ID) {
-                tenant.setAdminName("admin");
-            }
-            else {
+                String tenantDomain = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().
+                        getSuperTenantDomain();
+                String adminName = getTenantAdminUserName(tenantDomain);
+                log.info("Setting super tenant: " + tenantDomain + " and admin name: " + adminName
+                        + " to base tenant array.");
+                tenant.setAdminName(adminName);
+            } else {
+                log.info("Setting tenant: " + tenant.getId() + " to base tenant array.");
                 tenantsArray.set(i, tenantManager.getTenant(tenant.getId()));
             }
         }
         return tenantsArray;
+    }
+
+    /**
+     * Get tenant admin user name.
+     *
+     * @param tenantDomain tenant domain
+     * @return admin user name
+     * @throws UserStoreException if an error occurs
+     */
+    private String getTenantAdminUserName(String tenantDomain) throws UserStoreException {
+
+        try {
+            int tenantId = ServiceHolder.getRealmService().getTenantManager().
+                    getTenantId(tenantDomain);
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+            String adminUserName = ServiceHolder.getRealmService().getTenantUserRealm(tenantId)
+                    .getRealmConfiguration().getAdminUserName();
+            if (!tenantDomain.contentEquals(org.wso2.carbon.base.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+                return adminUserName.concat("@").concat(tenantDomain);
+            }
+            return adminUserName;
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
     }
 }
