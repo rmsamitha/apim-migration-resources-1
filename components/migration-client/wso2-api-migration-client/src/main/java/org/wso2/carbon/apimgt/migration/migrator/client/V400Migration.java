@@ -48,10 +48,11 @@ public class V400Migration extends VersionMigrator {
                 + getCurrentVersion() + "...");
         log.info("--------------------------------------------------------------------------------------------------");
 
-        log.info("WSO2 API-M Migration Task : Starting AM_DB schema migration from 3.2.0 to 4.0.0");
-        PreDBScriptMigrator preDBScriptMigrator = new PreDBScriptMigrator(Constants.V400_PRE_MIGRATION_SCRIPTS_PATH);
+        log.info("WSO2 API-M Migration Task : Starting AM_DB and REG_DB schema migration from 3.2.0 to 4.0.0");
+        PreDBScriptMigrator preDBScriptMigrator = new PreDBScriptMigrator(Constants.V400_PRE_MIGRATION_SCRIPTS_PATH,
+                Constants.V400_PRE_MIGRATION_REG_SCRIPTS_PATH);
         preDBScriptMigrator.run();
-        log.info("WSO2 API-M Migration Task : Completed AM_DB schema migration from 3.2.0 to 4.0.0");
+        log.info("WSO2 API-M Migration Task : Completed AM_DB and REG_DB schema migration from 3.2.0 to 4.0.0");
 
         log.info("WSO2 API-M Migration Task : Starting AM_DB data migration from 3.2.0 to 4.0.0");
         V400DBDataMigrator v400DBDataMigrator = new V400DBDataMigrator();
