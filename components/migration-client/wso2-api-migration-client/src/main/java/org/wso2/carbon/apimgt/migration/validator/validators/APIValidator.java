@@ -22,7 +22,10 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIDefinition;
 import org.wso2.carbon.apimgt.api.APIDefinitionValidationResponse;
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.api.APIProvider;
 import org.wso2.carbon.apimgt.api.ErrorHandler;
+import org.wso2.carbon.apimgt.api.FaultGatewaysException;
+import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIConstants.OASResourceAuthTypes;
@@ -30,18 +33,26 @@ import org.wso2.carbon.apimgt.impl.definitions.AsyncApiParserUtil;
 import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIMWSDLReader;
 import org.wso2.carbon.apimgt.impl.wsdl.model.WSDLValidationResponse;
+import org.wso2.carbon.apimgt.impl.wsdl.util.SOAPOperationBindingUtils;
+import org.wso2.carbon.apimgt.migration.client.internal.ServiceHolder;
+import org.wso2.carbon.apimgt.migration.migrator.Utility;
+import org.wso2.carbon.apimgt.migration.util.APIUtil;
 import org.wso2.carbon.apimgt.migration.util.Constants;
 import org.wso2.carbon.apimgt.migration.validator.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.migration.validator.utils.Utils;
 import org.wso2.carbon.apimgt.migration.validator.utils.V260Utils;
+import org.wso2.carbon.apimgt.rest.api.common.RestApiCommonUtil;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.common.mappings.PublisherCommonUtils;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.GraphQLValidationResponseDTO;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -63,6 +74,9 @@ public class APIValidator {
     private String provider;
     private String apiType;
     private String apiId;
+
+    private String tenantDomain;
+
     private static final Log log = LogFactory.getLog(APIValidator.class);
     private final String saveSwagger = System.getProperty(Constants.preValidationService.SAVE_INVALID_DEFINITION);
 
@@ -76,13 +90,13 @@ public class APIValidator {
      * @param preMigrationStep Pre-validation step to run
      * @throws GovernanceException if an error occurs while accessing artifact attributes
      */
-    public void validate(UserRegistry registry, GenericArtifact artifact, String preMigrationStep)
+    public void validate(String tenantDomain, UserRegistry registry, GenericArtifact artifact, String preMigrationStep)
             throws GovernanceException {
         this.registry = registry;
         this.apiName = artifact.getAttribute(APIConstants.API_OVERVIEW_NAME);
         this.apiVersion = artifact.getAttribute(APIConstants.API_OVERVIEW_VERSION);
         this.provider = artifact.getAttribute(APIConstants.API_OVERVIEW_PROVIDER);
-
+        this.tenantDomain = tenantDomain;
         // At this point of  pre-validation step, SOAP and SOAPTOREST APIs from 2.6.0 will have their overview_type
         // set as HTTP, hence we are employing a Util method to fetch correct API Type based on other resources and
         // artifact fields.
@@ -237,9 +251,52 @@ public class APIValidator {
         if (wsdlValidationResponse != null && !wsdlValidationResponse.isValid()) {
             log.error("Invalid WSDL definition found. " + wsdlValidationResponse.getError());
         } else {
+            if (APIConstants.API_TYPE_SOAPTOREST.equalsIgnoreCase(apiType)) {
+                int apiTenantId = 0;
+                try {
+                    apiTenantId = ServiceHolder.getRealmService().getTenantManager().getTenantId(tenantDomain);
+                    Utility.startTenantFlow(tenantDomain, apiTenantId, MultitenantUtils
+                            .getTenantAwareUsername(APIUtil.getTenantAdminUserName(tenantDomain)));
+                    log.info("CUSTOM_LOG>>>>" + "SOAP_TO_RET API exists. apiID=" + apiId + " apiName=" + apiName
+                            + " apiVersion=" + apiVersion);
+                    String swaggerStr = "";
+                    //TODO://support wsdl zip as well
+                    String wsdlPath = utils.getWSDLPath(apiName, apiVersion, provider);
+                    wsdl = (byte[]) registry.get(wsdlPath).getContent();
+                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdl);
+                    String updatedSwagger = updateSwagger(apiId, swaggerStr, tenantDomain);
+                    APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
+                    //adding the api
+                    API currentAPI = apiProvider.getAPIbyUUID(apiId, tenantDomain);
+                    PublisherCommonUtils
+                            .updateAPIBySettingGenerateSequencesFromSwagger(updatedSwagger, currentAPI, apiProvider,
+                                    tenantDomain);
+                } catch (RegistryException e) {
+                    throw new RuntimeException(e);
+                } catch (APIManagementException e) {
+                    throw new RuntimeException(e);
+                } catch (FaultGatewaysException e) {
+                    throw new RuntimeException(e);
+                } catch (UserStoreException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    PrivilegedCarbonContext.endTenantFlow();
+                }
+            }
             log.info("Successfully validated wsdl file of " + apiName + " version: " + apiVersion + " type: "
                     + apiType);
         }
+    }
+
+    private String updateSwagger(String apiId, String apiDefinition, String organization)
+            throws APIManagementException, FaultGatewaysException {
+        APIDefinitionValidationResponse response = OASParserUtil
+                .validateAPIDefinition(apiDefinition, true);
+        if (!response.isValid()) {
+            throw new RuntimeException("Error");
+        }
+        return PublisherCommonUtils.updateSwagger(apiId, response, false, organization);
+
     }
 
     private void validateStreamingAPIDefinition() {

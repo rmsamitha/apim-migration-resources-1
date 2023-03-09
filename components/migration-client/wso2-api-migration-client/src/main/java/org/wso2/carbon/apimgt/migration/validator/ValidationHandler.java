@@ -136,7 +136,7 @@ public class ValidationHandler {
                         if (artifactPath.contains("/apimgt/applicationdata/apis/")) {
                             continue;
                         }
-                        apiValidator.validate(registry, artifact, preMigrationStep);
+                        apiValidator.validate(tenant.getDomain(), registry, artifact, preMigrationStep);
                     } catch (Exception e) {
                         throw new APIMigrationException("Error occurred while retrieving API from the registry: "
                                 + "artifact path name " + artifactPath, e);
