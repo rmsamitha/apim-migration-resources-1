@@ -71,10 +71,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
 public class V420RegistryResourceMigrator extends RegistryResourceMigrator {
-
+    private static final String TRANSITIONS = "Transitions";
     private static final Log log = LogFactory.getLog(V420RegistryResourceMigrator.class);
+    private static final String CHECK_ITEMS = "CheckItems";
+    private static final String STATES = "States";
+    private static final String DATAMODEL = "datamodel";
+    private static final String NAME = "name";
     private final String PROVIDER_PATH = "/apimgt/applicationdata/provider";
     private final String API_LIFECYCLE_ASPECT = "APILifeCycle";
+    private static final String EVENT = "Event";
+    private static final String TARGET = "Target";
     List<Tenant> tenants;
 
     public V420RegistryResourceMigrator(String rxtDir) throws UserStoreException {
@@ -86,8 +92,8 @@ public class V420RegistryResourceMigrator extends RegistryResourceMigrator {
     private static JSONObject getTransitionObj(String event, String target) {
 
         JSONObject transitionObj = new JSONObject();
-        transitionObj.put("Event", event);
-        transitionObj.put("Target", target);
+        transitionObj.put(EVENT, event);
+        transitionObj.put(TARGET, target);
         return transitionObj;
     }
 
@@ -139,34 +145,34 @@ public class V420RegistryResourceMigrator extends RegistryResourceMigrator {
                             transitionArray.add(getTransitionObj(action.getNodeValue(), target.getNodeValue()));
                         }
                     }
-                    if ("datamodel".equals(transition.getNodeName())) {
+                    if (DATAMODEL.equals(transition.getNodeName())) {
                         NodeList datamodels = transition.getChildNodes();
                         int nDatamodel = datamodels.getLength();
                         for (int k = 0; k < nDatamodel; k++) {
                             Node dataNode = datamodels.item(k);
                             if (dataNode != null && dataNode.getAttributes() != null && "checkItems"
-                                    .equals(dataNode.getAttributes().getNamedItem("name").getNodeValue())) {
+                                    .equals(dataNode.getAttributes().getNamedItem(NAME).getNodeValue())) {
                                 NodeList items = dataNode.getChildNodes();
                                 for (int x = 0; x < items.getLength(); x++) {
                                     Node item = items.item(x);
                                     if (item != null && item.getAttributes() != null
-                                            && item.getAttributes().getNamedItem("name") != null) {
-                                        checkListItems.add(item.getAttributes().getNamedItem("name").getNodeValue());
+                                            && item.getAttributes().getNamedItem(NAME) != null) {
+                                        checkListItems.add(item.getAttributes().getNamedItem(NAME).getNodeValue());
                                     }
                                 }
                             }
                         }
                     }
                     if (transitionArray.size() > 0) {
-                        stateObj.put("Transitions", transitionArray);
+                        stateObj.put(TRANSITIONS, transitionArray);
                     }
                     if (checkListItems.size() > 0) {
-                        stateObj.put("CheckItems", checkListItems);
+                        stateObj.put(CHECK_ITEMS, checkListItems);
                     }
                 }
             }
             statesArray.add(stateObj);
-            LCConfigObj.put("States", statesArray);
+            LCConfigObj.put(STATES, statesArray);
         }
         log.info("WSO2 API-M Migration Task : API LifeCycle XML to JSON Conversion Completed.");
         return LCConfigObj;
